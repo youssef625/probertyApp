@@ -1,10 +1,27 @@
 import { useState } from 'react'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
 import heroImg from './assets/hero.png'
 import './App.css'
 
-function App() {
+// Admin
+import AdminLayout from './admin/components/AdminLayout'
+// Pages (We imports these after creating them, for now define empty placeholders)
+import PropertyApprovals from './admin/pages/PropertyApprovals'
+import LandlordRequests from './admin/pages/LandlordRequests'
+import Login from './admin/pages/Login'
+import { authService } from './admin/services/authService'
+
+// A wrapper for routes that need authentication
+const ProtectedRoute = ({ children }) => {
+  if (!authService.isAuthenticated()) {
+    return <Navigate to="/login" replace />;
+  }
+  return children;
+};
+
+function DefaultApp() {
   const [count, setCount] = useState(0)
 
   return (
@@ -115,6 +132,37 @@ function App() {
       <div className="ticks"></div>
       <section id="spacer"></section>
     </>
+  )
+}
+
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+
+const queryClient = new QueryClient()
+
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <Routes>
+          {/* Redirect root to admin property approvals */}
+          <Route path="/" element={<Navigate to="/admin" replace />} />
+          
+          {/* Auth Routes */}
+          <Route path="/login" element={<Login />} />
+          
+          {/* Admin Routes */}
+          <Route path="/admin" element={
+            <ProtectedRoute>
+              <AdminLayout />
+            </ProtectedRoute>
+          }>
+            <Route index element={<Navigate to="property-approvals" replace />} />
+            <Route path="property-approvals" element={<PropertyApprovals />} />
+            <Route path="landlord-requests" element={<LandlordRequests />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </QueryClientProvider>
   )
 }
 
