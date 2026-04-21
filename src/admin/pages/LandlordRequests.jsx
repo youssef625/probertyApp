@@ -2,7 +2,6 @@ import React from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { CalendarCheck, Users, CheckCircle2, Clock, ChevronLeft, ChevronRight, Hourglass } from 'lucide-react';
 import { adminService } from '../services/adminService';
-import '../admin.css';
 
 const LandlordRequests = () => {
   const queryClient = useQueryClient();
@@ -35,7 +34,7 @@ const LandlordRequests = () => {
   };
 
   return (
-    <div className="page-wrapper">
+    <div className="page-wrapper page-enter">
       
       <div className="requests-header-top">
         <div className="page-title" style={{ marginBottom: 0 }}>

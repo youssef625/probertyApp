@@ -17,9 +17,16 @@ const Login = () => {
     setLoading(true);
 
     try {
-      await authService.login(email, password);
-      // Wait for the cookie to be set, then navigate
-      navigate('/admin/property-approvals');
+      const loginData = await authService.login(email, password);
+      
+      const role = loginData.role || (loginData.roles && loginData.roles[0]) || loginData.Role || authService.getUserRole() || '';
+      
+      if (role.toLowerCase() === 'admin' || role.toLowerCase() === 'administrator') {
+        navigate('/admin/property-approvals');
+      } else {
+        // Assume Landlord / User
+        navigate('/properties');
+      }
     } catch (err) {
       setError('Invalid email or password. Please try again.');
     } finally {
@@ -35,8 +42,8 @@ const Login = () => {
           <div style={{ backgroundColor: '#2d3748', color: 'white', padding: '12px', borderRadius: '12px', marginBottom: '16px' }}>
             <BuildingIcon size={24} />
           </div>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#1a202c', margin: '0 0 8px 0' }}>RentVibe Admin</h1>
-          <p style={{ color: '#718096', fontSize: '0.9rem', margin: 0 }}>Sign in to manage your properties</p>
+          <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#1a202c', margin: '0 0 8px 0' }}>RentVibe Login</h1>
+          <p style={{ color: '#718096', fontSize: '0.9rem', margin: 0 }}>Discover or manage properties</p>
         </div>
 
         {error && (

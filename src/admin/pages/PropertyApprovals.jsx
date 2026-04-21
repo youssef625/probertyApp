@@ -3,7 +3,6 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import PropertyCard from '../components/PropertyCard';
 import { adminService } from '../services/adminService';
-import '../admin.css';
 
 const PropertyApprovals = () => {
   const queryClient = useQueryClient();
@@ -21,9 +20,9 @@ const PropertyApprovals = () => {
         title: item.title,
         location: item.location,
         price: item.price ? `$${item.price.toLocaleString()}/mo` : '$0/mo',
-        image: item.imageUrls && item.imageUrls.length > 0 
+        image: item.imageUrls && item.imageUrls.length > 0 && item.imageUrls[0] !== 'string'
           ? `https://app-260407103838.azurewebsites.net${item.imageUrls[0]}` 
-          : 'https://via.placeholder.com/400x300?text=No+Image',
+          : 'data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22300%22%20viewBox%3D%220%200%20400%20300%22%3E%3Crect%20fill%3D%22%23e2e8f0%22%20width%3D%22400%22%20height%3D%22300%22%2F%3E%3Ctext%20fill%3D%22%23718096%22%20font-family%3D%22sans-serif%22%20font-size%3D%2220%22%20font-weight%3D%22bold%22%20x%3D%2250%25%22%20y%3D%2250%25%22%20text-anchor%3D%22middle%22%3ENo%20Image%3C%2Ftext%3E%3C%2Fsvg%3E',
         status: item.approvalStatus === 'Pending' ? 'NEW SUBMISSION' : (item.approvalStatus || 'NEW SUBMISSION'),
         landlord: {
           name: item.landlordName || 'Unknown Landlord',
@@ -62,7 +61,7 @@ const PropertyApprovals = () => {
   });
 
   return (
-    <div className="page-wrapper">
+    <div className="page-wrapper page-enter">
       <div className="page-title">
         <h1>Property Approvals</h1>
         <p>Review and manage pending property listings for RentVibe.</p>

@@ -41,6 +41,21 @@ export const authService = {
     return Cookies.get('token');
   },
 
+  getUserRole: () => {
+    const token = Cookies.get('token');
+    if (!token) return null;
+    try {
+      // Decode JWT payload
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      // ASP.net standard role claim or short role name
+      const roleField = payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || payload.role || payload.Role;
+      if (Array.isArray(roleField)) return roleField[0].toLowerCase();
+      return roleField ? roleField.toLowerCase() : null;
+    } catch {
+      return null;
+    }
+  },
+
   isAuthenticated: () => {
     return !!Cookies.get('token');
   }
