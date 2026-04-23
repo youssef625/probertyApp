@@ -1,24 +1,34 @@
-import React from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import React, { useState, useEffect } from 'react';
 import { CalendarCheck, Users, CheckCircle2, Clock, ChevronLeft, ChevronRight, Hourglass } from 'lucide-react';
 import { adminService } from '../services/adminService';
+import '../admin.css';
 
 const LandlordRequests = () => {
-  const queryClient = useQueryClient();
+  const [requests, setRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const { data: requests = [], isLoading: loading } = useQuery({
-    queryKey: ['pendingLandlords'],
-    queryFn: async () => {
+  useEffect(() => {
+    fetchLandlords();
+  }, []);
+
+  const fetchLandlords = async () => {
+    try {
+      setLoading(true);
       const data = await adminService.getPendingLandlords();
-      return Array.isArray(data) ? data : (data?.data || data?.items || []);
-    },
-    staleTime: 5 * 60 * 1000, // 5 minutes
-  });
+      setRequests(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error('Failed to load landlords', err);
+      // Optional fallback
+      setRequests([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleApprove = async (id) => {
     try {
       await adminService.approveLandlord(id);
-      queryClient.setQueryData(['pendingLandlords'], (old) => old?.filter(r => (r.id || r.landlordId) !== id));
+      setRequests(requests.filter(r => (r.id || r.landlordId) !== id));
     } catch {
       alert("Failed to approve landlord.");
     }
@@ -27,14 +37,14 @@ const LandlordRequests = () => {
   const handleReject = async (id) => {
     try {
       await adminService.rejectLandlord(id);
-      queryClient.setQueryData(['pendingLandlords'], (old) => old?.filter(r => (r.id || r.landlordId) !== id));
+      setRequests(requests.filter(r => (r.id || r.landlordId) !== id));
     } catch {
       alert("Failed to reject landlord.");
     }
   };
 
   return (
-    <div className="page-wrapper page-enter">
+    <div className="page-wrapper">
       
       <div className="requests-header-top">
         <div className="page-title" style={{ marginBottom: 0 }}>
@@ -69,7 +79,6 @@ const LandlordRequests = () => {
              <div style={{ padding: '24px', textAlign: 'center', color: '#718096' }}>Loading requests...</div>
           )}
           {requests.map((request, index) => {
-            // Mapping Fallbacks in case APIs differ slightly from UI mock
             const id = request.id || request.landlordId || index;
             const name = request.name || 'Unknown Landlord';
             const email = request.email || 'No email provided';
