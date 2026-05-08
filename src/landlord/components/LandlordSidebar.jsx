@@ -1,19 +1,19 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { BuildingIcon, UserPlus, CheckSquare, HelpCircle, LogOut } from 'lucide-react';
-import { login, logout, getUserToken } from '../../services/api';
-import '../admin.css';
+import { BuildingIcon, Home, Calendar, FileText, LogOut } from 'lucide-react';
+import { logout } from '../../services/api';
+import '../landlord.css';
 
-const Sidebar = () => {
+const LandlordSidebar = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
     logout();
-    navigate('/admin/login', { replace: true });
+    navigate('/login', { replace: true });
   };
 
   return (
-    <aside className="admin-sidebar">
+    <aside className="landlord-sidebar">
       <div className="sidebar-top">
         <div className="sidebar-logo">
           <div className="sidebar-logo-icon">
@@ -21,31 +21,38 @@ const Sidebar = () => {
           </div>
           <div>
             <div className="sidebar-logo-text">RentVibe</div>
-            <div className="sidebar-logo-sub">ADMIN CONSOLE</div>
+            <div className="sidebar-logo-sub">LANDLORD PORTAL</div>
           </div>
         </div>
         
         <nav className="sidebar-nav">
           <NavLink 
-            to="/admin/landlord-requests" 
+            to="/landlord/properties" 
             className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
           >
-            <UserPlus size={18} />
-            <span>Landlord Requests</span>
+            <Home size={18} />
+            <span>My Properties</span>
           </NavLink>
           
           <NavLink 
-            to="/admin/property-approvals" 
+            to="/landlord/visits" 
             className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
           >
-            <CheckSquare size={18} />
-            <span>Property Approvals</span>
+            <Calendar size={18} />
+            <span>Visit Requests</span>
+          </NavLink>
+
+          <NavLink 
+            to="/landlord/applications" 
+            className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+          >
+            <FileText size={18} />
+            <span>Rental Applications</span>
           </NavLink>
         </nav>
       </div>
       
       <div className="sidebar-bottom sidebar-nav">
-
         <button className="nav-item mt-auto" onClick={handleLogout}>
           <LogOut size={18} />
           <span>Logout</span>
@@ -55,4 +62,4 @@ const Sidebar = () => {
   );
 };
 
-export default Sidebar;
+export default LandlordSidebar;

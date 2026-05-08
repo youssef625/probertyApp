@@ -2,12 +2,17 @@ import React, { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import PropertyCard from '../components/PropertyCard';
+import ErrorBanner from '../../components/ErrorBanner';
+import { getApiErrorMessages } from '../../utils/apiClient';
 import { adminService } from '../services/adminService';
 import '../admin.css';
+
+const API_BASE_URL = window.location.origin.replace(/\/+$/, '');
 
 const PropertyApprovals = () => {
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState('All Requests');
+  const [actionErrors, setActionErrors] = useState([]);
 
   const { data: properties = [], isLoading: loading } = useQuery({
     queryKey: ['pendingProperties'],
@@ -22,7 +27,7 @@ const PropertyApprovals = () => {
         location: item.location,
         price: item.price ? `$${item.price.toLocaleString()}/mo` : '$0/mo',
         image: item.imageUrls && item.imageUrls.length > 0 
-          ? `https://app-260407103838.azurewebsites.net${item.imageUrls[0]}` 
+          ? `${API_BASE_URL}${item.imageUrls[0]}` 
           : 'https://via.placeholder.com/400x300?text=No+Image',
         status: item.approvalStatus === 'Pending' ? 'NEW SUBMISSION' : (item.approvalStatus || 'NEW SUBMISSION'),
         landlord: {
@@ -39,8 +44,9 @@ const PropertyApprovals = () => {
       await adminService.approveProperty(id);
       // Remove from Cache instantly
       queryClient.setQueryData(['pendingProperties'], (old) => old?.filter(p => (p.id || p.propertyId) !== id));
-    } catch {
-      alert("Failed to approve property.");
+      setActionErrors([]);
+    } catch (err) {
+      setActionErrors(getApiErrorMessages(err));
     }
   };
 
@@ -49,8 +55,9 @@ const PropertyApprovals = () => {
       await adminService.rejectProperty(id);
       // Remove from Cache instantly
       queryClient.setQueryData(['pendingProperties'], (old) => old?.filter(p => (p.id || p.propertyId) !== id));
-    } catch {
-      alert("Failed to reject property.");
+      setActionErrors([]);
+    } catch (err) {
+      setActionErrors(getApiErrorMessages(err));
     }
   };
 
@@ -67,6 +74,8 @@ const PropertyApprovals = () => {
         <h1>Property Approvals</h1>
         <p>Review and manage pending property listings for RentVibe.</p>
       </div>
+
+      <ErrorBanner messages={actionErrors} className="mb-6" />
 
       <div className="tabs-container">
         {['All Requests', 'Urgent', 'Flagged'].map((tab) => (
@@ -110,14 +119,7 @@ const PropertyApprovals = () => {
       </div>
 
       <div className="table-footer" style={{ marginTop: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ color: '#718096', fontSize: '0.85rem' }}>Showing {filteredProperties.length > 0 ? filteredProperties.length : 0} of 24 pending properties</div>
-        <div className="table-pagination" style={{ display: 'flex', gap: '8px' }}>
-          <button className="pagination-btn" style={{ padding: '8px', border: '1px solid #e2e8f0', borderRadius: '8px', background: 'white' }}><ChevronLeft size={16} /></button>
-          <button className="pagination-btn active" style={{ padding: '4px 12px', border: 'none', borderRadius: '8px', background: '#374151', color: 'white' }}>1</button>
-          <button className="pagination-btn" style={{ padding: '4px 12px', border: '1px solid #e2e8f0', borderRadius: '8px', background: 'white' }}>2</button>
-          <button className="pagination-btn" style={{ padding: '4px 12px', border: '1px solid #e2e8f0', borderRadius: '8px', background: 'white' }}>3</button>
-          <button className="pagination-btn" style={{ padding: '8px', border: '1px solid #e2e8f0', borderRadius: '8px', background: 'white' }}><ChevronRight size={16} /></button>
-        </div>
+        <div style={{ color: '#718096', fontSize: '0.85rem' }}>Showing {filteredProperties.length} pending {filteredProperties.length === 1 ? 'property' : 'properties'}</div>
       </div>
     </div>
   );

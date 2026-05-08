@@ -1,27 +1,29 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { authService } from '../services/authService';
+import { login, logout, getUserToken } from '../../services/api';
+import ErrorBanner from '../../components/ErrorBanner';
+import { getApiErrorMessages } from '../../utils/apiClient';
 import { BuildingIcon } from 'lucide-react';
 import '../admin.css';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [errorMessages, setErrorMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setError('');
+    setErrorMessages([]);
     setLoading(true);
 
     try {
-      await authService.login(email, password);
+      await login(email, password);
       // Wait for the cookie to be set, then navigate
       navigate('/admin/property-approvals');
     } catch (err) {
-      setError('Invalid email or password. Please try again.');
+      setErrorMessages(getApiErrorMessages(err));
     } finally {
       setLoading(false);
     }
@@ -39,11 +41,7 @@ const Login = () => {
           <p style={{ color: '#718096', fontSize: '0.9rem', margin: 0 }}>Sign in to manage your properties</p>
         </div>
 
-        {error && (
-          <div style={{ backgroundColor: '#fff5f5', color: '#c53030', padding: '12px', borderRadius: '8px', marginBottom: '24px', fontSize: '0.85rem', textAlign: 'center' }}>
-            {error}
-          </div>
-        )}
+        <ErrorBanner messages={errorMessages} className="mb-6" />
 
         <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           <div>
@@ -52,7 +50,7 @@ const Login = () => {
               type="email" 
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="admin@rentvibe.com"
+              placeholder="email@example.com"
               style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1px solid #e2e8f0', outline: 'none', fontSize: '0.9rem', boxSizing: 'border-box' }}
               required 
             />

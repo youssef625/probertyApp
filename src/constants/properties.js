@@ -1,0 +1,36 @@
+export const properties = [
+  {
+    id: '1',
+    title: 'Luxury Furnished 3-Bedroom Apartment in Mohandessin',
+    price: 15000,
+    area: 120,
+    bedrooms: 3,
+    bathrooms: 2,
+    location: 'Mohandessin - Shehab Street',
+    status: 'Available Now',
+    thumbnail: 'https://images.housesolutionegypt.com/images/properties/6270/mivida-apartment-for-rent-160m2-3br-3ba-furnished-12.webp',
+  },
+  {
+    id: '2',
+    title: 'Super Lux Furnished 3-Bedroom Apartment - New Cairo',
+    price: 28000,
+    area: 150,
+    bedrooms: 3,
+    bathrooms: 3,
+    location: 'Fifth Settlement - Compound',
+    status: 'Available',
+    thumbnail: 'https://a0.muscache.com/im/pictures/hosting/Hosting-1389704208895953397/original/462d40ba-bfe0-48e1-b477-240afe2726f3.jpeg',
+  },
+  {
+    id: '3',
+    title: 'Furnished 3-Bedroom Apartment with Nile View - Zamalek',
+    price: 35000,
+    area: 140,
+    bedrooms: 3,
+    bathrooms: 2,
+    location: 'Zamalek - Nile View',
+    status: 'Available Soon',
+    thumbnail: 'https://a0.muscache.com/im/pictures/hosting/Hosting-1197153629879952777/original/7abc2df0-8c76-4d3f-8452-7d8b18397c36.jpeg',
+  },
+  // Add more entries in the same format as needed.
+];

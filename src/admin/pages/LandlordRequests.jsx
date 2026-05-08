@@ -2,10 +2,13 @@ import React from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { CalendarCheck, Users, CheckCircle2, Clock, ChevronLeft, ChevronRight, Hourglass } from 'lucide-react';
 import { adminService } from '../services/adminService';
+import ErrorBanner from '../../components/ErrorBanner';
+import { getApiErrorMessages } from '../../utils/apiClient';
 import '../admin.css';
 
 const LandlordRequests = () => {
   const queryClient = useQueryClient();
+  const [actionErrors, setActionErrors] = React.useState([]);
 
   const { data: requests = [], isLoading: loading } = useQuery({
     queryKey: ['pendingLandlords'],
@@ -20,8 +23,9 @@ const LandlordRequests = () => {
     try {
       await adminService.approveLandlord(id);
       queryClient.setQueryData(['pendingLandlords'], (old) => old?.filter(r => (r.id || r.landlordId) !== id));
-    } catch {
-      alert("Failed to approve landlord.");
+      setActionErrors([]);
+    } catch (err) {
+      setActionErrors(getApiErrorMessages(err));
     }
   };
 
@@ -29,8 +33,9 @@ const LandlordRequests = () => {
     try {
       await adminService.rejectLandlord(id);
       queryClient.setQueryData(['pendingLandlords'], (old) => old?.filter(r => (r.id || r.landlordId) !== id));
-    } catch {
-      alert("Failed to reject landlord.");
+      setActionErrors([]);
+    } catch (err) {
+      setActionErrors(getApiErrorMessages(err));
     }
   };
 
@@ -53,6 +58,8 @@ const LandlordRequests = () => {
           </div>
         </div>
       </div>
+
+      <ErrorBanner messages={actionErrors} className="mb-6" />
 
       <div className="admin-table-container">
         <div className="admin-table-header">
@@ -120,11 +127,7 @@ const LandlordRequests = () => {
         </div>
         
         <div className="table-footer">
-          <div>SHOWING 1 TO {requests.length > 0 ? requests.length : 0} OF {requests.length} ENTRIES</div>
-          <div className="table-pagination">
-            <button className="pagination-btn"><ChevronLeft size={16} /></button>
-            <button className="pagination-btn"><ChevronRight size={16} /></button>
-          </div>
+          <div>SHOWING {requests.length} {requests.length === 1 ? 'ENTRY' : 'ENTRIES'}</div>
         </div>
       </div>
 
