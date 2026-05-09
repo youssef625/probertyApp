@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Check, X, FileText, User, Calendar, MapPin } from 'lucide-react';
 import { landlordService } from '../services/landlordService';
 import ErrorBanner from '../../components/ErrorBanner';
-import { getApiErrorMessages } from '../../utils/apiClient';
+import { getApiBaseUrl, getApiErrorMessages } from '../../utils/apiClient';
 
-const API_BASE_URL = window.location.origin.replace(/\/+$/, '');
+const API_BASE_URL = getApiBaseUrl();
 const resolveDocumentUrl = (doc) => doc.startsWith('http') ? doc : `${API_BASE_URL}${doc}`;
 
 const RentalApplications = () => {

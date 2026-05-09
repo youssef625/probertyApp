@@ -1,7 +1,7 @@
-import { apiClient, USER_TOKEN_KEY } from '../utils/apiClient';
+import { apiClient, getApiBaseUrl, USER_TOKEN_KEY } from '../utils/apiClient';
 
 // Base URL for the RentVibe API
-const API_ORIGIN = window.location.origin.replace(/\/+$/, '');
+const API_ORIGIN = getApiBaseUrl();
 export const AUTH_STATE_EVENT = 'auth-state-changed';
 export { USER_TOKEN_KEY };
 

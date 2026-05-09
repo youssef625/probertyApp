@@ -1,8 +1,8 @@
 import * as signalR from '@microsoft/signalr';
 import { getUserToken } from './api';
+import { getApiBaseUrl } from '../utils/apiClient';
 
-const API_BASE_URL = window.location.origin.replace(/\/+$/, ''); 
-const HUB_URL = `${API_BASE_URL}/notificationHub`;
+const HUB_URL = `${getApiBaseUrl()}/notificationHub`;
 
 class SocketService {
   constructor() {
@@ -11,31 +11,48 @@ class SocketService {
   }
 
   connect() {
-    if (this.connection) return;
+    // Allow reconnection if previous connection failed or was stopped
+    if (this.connection && this.connection.state !== signalR.HubConnectionState.Disconnected) {
+      return;
+    }
 
     const token = getUserToken();
-    if (!token) return;
+    if (!token) {
+      console.warn('SocketService: No auth token found, skipping connection.');
+      return;
+    }
 
     this.connection = new signalR.HubConnectionBuilder()
       .withUrl(HUB_URL, {
-        accessTokenFactory: () => token
+        accessTokenFactory: () => getUserToken() // Always fetch fresh token
       })
       .withAutomaticReconnect()
+      .configureLogging(signalR.LogLevel.Warning)
       .build();
+
+    // Pre-register all stored listeners BEFORE starting the connection.
+    // SignalR JS client allows calling .on() before .start(), so messages
+    // received immediately after connection are not lost.
+    this.listeners.forEach((callbacks, eventName) => {
+      callbacks.forEach(callback => {
+        this.connection.on(eventName, callback);
+      });
+    });
 
     this.connection.start()
       .then(() => {
         console.log('SignalR Connected!');
-        // Re-attach listeners after connection
-        this.listeners.forEach((callbacks, eventName) => {
-          callbacks.forEach(callback => {
-            this.connection.on(eventName, callback);
-          });
-        });
       })
       .catch(err => {
         console.error('SignalR Connection Error: ', err);
+        // Reset so reconnection is possible on next connect() call
+        this.connection = null;
       });
+
+    // Re-attach listeners after automatic reconnects
+    this.connection.onreconnected(() => {
+      console.log('SignalR Reconnected!');
+    });
   }
 
   disconnect() {
@@ -51,7 +68,8 @@ class SocketService {
     }
     this.listeners.get(eventName).push(callback);
 
-    if (this.connection && this.connection.state === signalR.HubConnectionState.Connected) {
+    // Also register on the live connection (works in any state)
+    if (this.connection) {
       this.connection.on(eventName, callback);
     }
   }

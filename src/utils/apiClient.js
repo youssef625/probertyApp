@@ -1,5 +1,13 @@
 export const USER_TOKEN_KEY = 'user_token';
-const API_BASE_URL = window.location.origin.replace(/\/+$/, '');
+
+const resolveApiBaseUrl = () => {
+  const envUrl = (import.meta.env?.VITE_API_URL || '').trim();
+  const baseUrl = envUrl || window.location.origin;
+  return baseUrl.replace(/\/+$/, '');
+};
+
+const API_BASE_URL = resolveApiBaseUrl();
+export const getApiBaseUrl = () => API_BASE_URL;
 
 class ApiError extends Error {
   constructor(message, status, data, messages = []) {

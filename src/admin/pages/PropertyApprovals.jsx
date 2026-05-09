@@ -3,11 +3,11 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import PropertyCard from '../components/PropertyCard';
 import ErrorBanner from '../../components/ErrorBanner';
-import { getApiErrorMessages } from '../../utils/apiClient';
+import { getApiBaseUrl, getApiErrorMessages } from '../../utils/apiClient';
 import { adminService } from '../services/adminService';
 import '../admin.css';
 
-const API_BASE_URL = window.location.origin.replace(/\/+$/, '');
+const API_BASE_URL = getApiBaseUrl();
 
 const PropertyApprovals = () => {
   const queryClient = useQueryClient();
