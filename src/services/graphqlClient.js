@@ -1,8 +1,9 @@
 import { ApolloClient, InMemoryCache, HttpLink, ApolloLink } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
 import { getUserToken } from './api';
+import { getApiBaseUrl } from '../utils/apiClient';
 
-const GRAPHQL_URL = `${window.location.origin.replace(/\/+$/, '')}/graphql`;
+const GRAPHQL_URL = `${getApiBaseUrl()}/graphql`;
 
 const httpLink = new HttpLink({
   uri: GRAPHQL_URL

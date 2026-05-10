@@ -13,8 +13,10 @@ const LandlordLayout = () => {
     // Connect to SignalR socket on mount
     socketService.connect();
 
-    const handleNewNotification = (message) => {
-      setNotifications(prev => [{ id: Date.now(), message, read: false }, ...prev].slice(0, 5)); // Keep last 5
+    const handleNewNotification = (data) => {
+      // Backend sends an object: { Id, Message, Type, ReferenceId, CreatedAt, IsRead }
+      const text = typeof data === 'string' ? data : (data?.Message || data?.message || JSON.stringify(data));
+      setNotifications(prev => [{ id: data?.Id || Date.now(), message: text, read: false }, ...prev].slice(0, 5)); // Keep last 5
     };
 
     // Listen to standard events we expect the backend to emit

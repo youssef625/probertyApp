@@ -5,7 +5,6 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import AdminLayout from './admin/components/AdminLayout'
 import PropertyApprovals from './admin/pages/PropertyApprovals'
 import LandlordRequests from './admin/pages/LandlordRequests'
-import AdminLogin from './admin/pages/Login'
 
 
 // Landlord
@@ -15,7 +14,7 @@ import RentalApplications from './landlord/pages/RentalApplications'
 import VisitRequests from './landlord/pages/VisitRequests'
 
 // Public app
-import { hasUserSession, AUTH_STATE_EVENT, isAdminOrLandlordRole, isAdminRole, isLandlordRole } from './services/api'
+import { hasUserSession, AUTH_STATE_EVENT, isAdminRole, isLandlordRole } from './services/api'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Home from './pages/Home'
@@ -24,7 +23,7 @@ import Favorites from './pages/Favorites'
 
 // A wrapper for routes that need authentication
 const AdminProtectedRoute = ({ children }) => {
-  if (!hasUserSession()) return <Navigate to="/admin/login" replace />;
+  if (!hasUserSession()) return <Navigate to="/login" replace />;
   if (!isAdminRole()) return <Navigate to="/" replace />;
   return children;
 };
@@ -51,14 +50,6 @@ const UserGuestRoute = ({ children }) => {
   return children;
 };
 
-const AdminGuestRoute = ({ children }) => {
-  if (hasUserSession()) {
-    if (isAdminRole()) return <Navigate to="/admin" replace />;
-    if (isLandlordRole()) return <Navigate to="/landlord" replace />;
-    return <Navigate to="/" replace />;
-  }
-  return children;
-};
 
 const PublicUserRoute = ({ children }) => {
   if (hasUserSession()) {
@@ -96,9 +87,6 @@ function App() {
           <Route path="/" element={<PublicUserRoute><Home /></PublicUserRoute>} />
           <Route path="/property/:id" element={<UserProtectedRoute><PropertyView /></UserProtectedRoute>} />
           <Route path="/favorites" element={<UserProtectedRoute><Favorites /></UserProtectedRoute>} />
-
-          {/* Admin Auth */}
-          <Route path="/admin/login" element={<AdminGuestRoute><AdminLogin /></AdminGuestRoute>} />
 
           {/* Admin */}
           <Route path="/admin" element={<AdminProtectedRoute><AdminLayout /></AdminProtectedRoute>}>

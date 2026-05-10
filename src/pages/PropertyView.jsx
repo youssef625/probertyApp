@@ -2,7 +2,27 @@
 
 import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { getPropertyById, addToFavorites, scheduleVisit, hasUserSession, getPropertyReviews, createReview, resolveMediaUrl } from '../services/api';
+import {
+  FiAlertTriangle,
+  FiArrowLeft,
+  FiArrowUp,
+  FiCalendar,
+  FiCheckCircle,
+  FiClock,
+  FiEye,
+  FiFileText,
+  FiHeart,
+  FiHome,
+  FiMapPin,
+  FiPhone,
+  FiStar,
+  FiTruck,
+  FiUser,
+  FiX,
+  FiXCircle,
+} from 'react-icons/fi';
+import { addToFavorites, removeFromFavorites, scheduleVisit, getFavorites, getMyVisits, hasUserSession, getPropertyReviews, createReview, resolveMediaUrl } from '../services/api';
+import { getPropertyByIdGql } from '../services/graphqlApi';
 import { getApiErrorMessages } from '../utils/apiClient';
 
 const PropertyView = () => {
@@ -13,6 +33,9 @@ const PropertyView = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [actionMessage, setActionMessage] = useState(null);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [hasVisitRequest, setHasVisitRequest] = useState(false);
+  const [userMetaLoading, setUserMetaLoading] = useState(false);
 
   // Fetch property details when component mounts or ID changes
   useEffect(() => {
@@ -20,11 +43,11 @@ const PropertyView = () => {
       try {
         setLoading(true);
         setError(null);
-        const data = await getPropertyById(id);
+        const data = await getPropertyByIdGql(id);
         setProperty(data);
       } catch (err) {
         setError('Unable to load property details. This property may not exist.');
-        console.error('❌ Error fetching property details:', err);
+        console.error('Error fetching property details:', err);
       } finally {
         setLoading(false);
       }
@@ -33,20 +56,75 @@ const PropertyView = () => {
     if (id) fetchPropertyDetails();
   }, [id]);
 
+  useEffect(() => {
+    if (!id || !hasUserSession()) {
+      setIsFavorite(false);
+      setHasVisitRequest(false);
+      return;
+    }
+
+    let isActive = true;
+    const propertyId = Number(id);
+
+    const fetchUserMeta = async () => {
+      setUserMetaLoading(true);
+      try {
+        const [favorites, visits] = await Promise.all([getFavorites(), getMyVisits()]);
+
+        if (!isActive) return;
+
+        const favoriteList = Array.isArray(favorites) ? favorites : [];
+        const favoriteMatch = favoriteList.some((fav) => {
+          const favId = fav?.propertyId ?? fav?.property?.id ?? fav?.PropertyId;
+          return Number(favId) === propertyId;
+        });
+
+        const visitList = Array.isArray(visits) ? visits : [];
+        const visitMatch = visitList.some((visit) => {
+          const visitPropertyId = Number(visit?.propertyId ?? visit?.PropertyId);
+          const statusValue = (visit?.status ?? visit?.Status ?? '').toString().toLowerCase();
+          return visitPropertyId === propertyId && statusValue === 'pending';
+        });
+
+        setIsFavorite(favoriteMatch);
+        setHasVisitRequest(visitMatch);
+      } catch (err) {
+        console.error('❌ Error fetching user meta:', err);
+      } finally {
+        if (isActive) {
+          setUserMetaLoading(false);
+        }
+      }
+    };
+
+    fetchUserMeta();
+
+    return () => {
+      isActive = false;
+    };
+  }, [id]);
+
   // Handle favorite toggle action
   const handleFavoriteToggle = async () => {
     if (!hasUserSession()) {
-      setActionMessage({ type: 'warning', text: '⚠️ Please sign in to add to favorites' });
+      setActionMessage({ type: 'warning', text: 'Please sign in to add to favorites' });
       setTimeout(() => setActionMessage(null), 3000);
       return;
     }
 
     try {
-      await addToFavorites(id);
-      setActionMessage({ type: 'success', text: '✅ Added to favorites successfully' });
+      if (isFavorite) {
+        await removeFromFavorites(id);
+        setIsFavorite(false);
+        setActionMessage({ type: 'success', text: 'Removed from favorites' });
+      } else {
+        await addToFavorites(id);
+        setIsFavorite(true);
+        setActionMessage({ type: 'success', text: 'Added to favorites successfully' });
+      }
     } catch (err) {
       const [message] = getApiErrorMessages(err);
-      setActionMessage({ type: 'error', text: message || '❌ Failed to add to favorites' });
+      setActionMessage({ type: 'error', text: message || 'Failed to update favorites' });
     }
     setTimeout(() => setActionMessage(null), 3000);
   };
@@ -54,7 +132,13 @@ const PropertyView = () => {
   // Handle visit scheduling
   const handleScheduleVisit = async () => {
     if (!hasUserSession()) {
-      setActionMessage({ type: 'warning', text: '⚠️ Please sign in to schedule a visit' });
+      setActionMessage({ type: 'warning', text: 'Please sign in to schedule a visit' });
+      setTimeout(() => setActionMessage(null), 3000);
+      return;
+    }
+
+    if (hasVisitRequest) {
+      setActionMessage({ type: 'warning', text: 'You already have a pending visit request for this property' });
       setTimeout(() => setActionMessage(null), 3000);
       return;
     }
@@ -64,10 +148,11 @@ const PropertyView = () => {
       futureDate.setDate(futureDate.getDate() + 3);
 
       await scheduleVisit(id, futureDate.toISOString(), 'I would like to schedule a property viewing');
-      setActionMessage({ type: 'success', text: '✅ Visit request sent successfully' });
+      setHasVisitRequest(true);
+      setActionMessage({ type: 'success', text: 'Visit request sent successfully' });
     } catch (err) {
       const [message] = getApiErrorMessages(err);
-      setActionMessage({ type: 'error', text: message || '❌ Failed to schedule visit' });
+      setActionMessage({ type: 'error', text: message || 'Failed to schedule visit' });
     }
     setTimeout(() => setActionMessage(null), 4000);
   };
@@ -87,14 +172,19 @@ const PropertyView = () => {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-base-200">
         <div className="alert alert-error shadow-lg max-w-md mb-6">
-          <div>
-            <span>⚠️</span>
-            <span className="font-bold">Sorry!</span>
-            <span className="block">{error || 'Property not found'}</span>
+          <div className="flex items-start gap-3">
+            <span className="inline-flex items-center justify-center rounded-full bg-error/10 text-error p-2">
+              <FiAlertTriangle className="h-5 w-5" aria-hidden="true" />
+            </span>
+            <div>
+              <span className="font-bold">Sorry!</span>
+              <span className="block">{error || 'Property not found'}</span>
+            </div>
           </div>
         </div>
         <button className="btn btn-outline" onClick={() => navigate('/')}>
-          ← Back to Home
+          <FiArrowLeft className="h-4 w-4" aria-hidden="true" />
+          Back to Home
         </button>
       </div>
     );
@@ -107,9 +197,20 @@ const PropertyView = () => {
     <div className="min-h-screen bg-base-200 text-base-content">
       {/* Action feedback toast */}
       {actionMessage && (
-        <div className={`alert shadow-lg fixed top-4 left-1/2 transform -translate-x-1/2 z-50 max-w-md ${actionMessage.type === 'success' ? 'alert-success' :
-          actionMessage.type === 'error' ? 'alert-error' : 'alert-warning'
-          }`}>
+        <div
+          className={`alert shadow-lg fixed top-4 left-1/2 transform -translate-x-1/2 z-50 max-w-md ${actionMessage.type === 'success' ? 'alert-success' :
+            actionMessage.type === 'error' ? 'alert-error' : 'alert-warning'
+            }`}
+        >
+          <span className="inline-flex items-center justify-center rounded-full bg-base-100/60 p-2">
+            {actionMessage.type === 'success' ? (
+              <FiCheckCircle className="h-5 w-5" aria-hidden="true" />
+            ) : actionMessage.type === 'error' ? (
+              <FiXCircle className="h-5 w-5" aria-hidden="true" />
+            ) : (
+              <FiAlertTriangle className="h-5 w-5" aria-hidden="true" />
+            )}
+          </span>
           <span>{actionMessage.text}</span>
         </div>
       )}
@@ -149,6 +250,13 @@ const PropertyView = () => {
 
       {/* Main content section */}
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-12">
+        <div className="mb-6">
+          <button className="btn btn-outline gap-2" onClick={() => navigate('/')}
+          >
+            <FiArrowLeft className="h-4 w-4" aria-hidden="true" />
+            Back to Home
+          </button>
+        </div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 md:gap-10">
 
           <div className="lg:col-span-2 space-y-8 md:space-y-10">
@@ -164,7 +272,8 @@ const PropertyView = () => {
                 )}
               </div>
               <p className="text-lg text-base-content/70 flex items-center gap-2">
-                <span>📍</span> {property.location}
+                <FiMapPin className="h-5 w-5 text-primary" aria-hidden="true" />
+                {property.location}
               </p>
             </div>
 
@@ -184,18 +293,39 @@ const PropertyView = () => {
             </div>
 
             <div>
-              <h2 className="text-2xl md:text-3xl font-semibold mb-4">📝 Property Description</h2>
+              <h2 className="text-2xl md:text-3xl font-semibold mb-4 flex items-center gap-2">
+                <FiFileText className="h-6 w-6 text-primary" aria-hidden="true" />
+                Property Description
+              </h2>
               <p className="text-lg leading-relaxed whitespace-pre-line text-base-content/90">
                 {property.description || 'No description available for this property.'}
               </p>
             </div>
 
             <div>
-              <h2 className="text-2xl md:text-3xl font-semibold mb-4">✨ Amenities</h2>
+              <h2 className="text-2xl md:text-3xl font-semibold mb-4 flex items-center gap-2">
+                <FiStar className="h-6 w-6 text-primary" aria-hidden="true" />
+                Amenities
+              </h2>
               <div className="flex flex-wrap gap-3">
-                {property.hasParking && <div className="badge badge-outline text-base px-5 py-3">🅿️ Parking</div>}
-                {property.hasElevator && <div className="badge badge-outline text-base px-5 py-3">🛗 Elevator</div>}
-                {property.isFurnished && <div className="badge badge-outline text-base px-5 py-3">🪑 Furnished</div>}
+                {property.hasParking && (
+                  <div className="badge badge-outline text-base px-5 py-3 flex items-center gap-2">
+                    <FiTruck className="h-4 w-4" aria-hidden="true" />
+                    Parking
+                  </div>
+                )}
+                {property.hasElevator && (
+                  <div className="badge badge-outline text-base px-5 py-3 flex items-center gap-2">
+                    <FiArrowUp className="h-4 w-4" aria-hidden="true" />
+                    Elevator
+                  </div>
+                )}
+                {property.isFurnished && (
+                  <div className="badge badge-outline text-base px-5 py-3 flex items-center gap-2">
+                    <FiHome className="h-4 w-4" aria-hidden="true" />
+                    Furnished
+                  </div>
+                )}
 
                 {property.amenities?.map((item, idx) => (
                   <div key={idx} className="badge badge-outline text-base px-5 py-3">{item}</div>
@@ -212,13 +342,19 @@ const PropertyView = () => {
           <div className="lg:col-span-1">
             <div className="card bg-base-100 shadow-2xl sticky top-6">
               <div className="card-body">
-                <h2 className="card-title text-2xl mb-2">👤 Landlord Information</h2>
+                <h2 className="card-title text-2xl mb-2 flex items-center gap-2">
+                  <FiUser className="h-5 w-5 text-primary" aria-hidden="true" />
+                  Landlord Information
+                </h2>
 
                 {property.landlord ? (
                   <>
                     <p className="text-xl font-medium">{property.landlord.name || property.landlord}</p>
                     {property.landlord.phone && (
-                      <p className="text-base text-base-content/70">📞 {property.landlord.phone}</p>
+                      <p className="text-base text-base-content/70 flex items-center gap-2">
+                        <FiPhone className="h-4 w-4" aria-hidden="true" />
+                        {property.landlord.phone}
+                      </p>
                     )}
                   </>
                 ) : (
@@ -226,26 +362,56 @@ const PropertyView = () => {
                 )}
 
                 <div className="card-actions flex flex-col gap-3 mt-6">
-                  <button className="btn btn-primary btn-lg w-full" onClick={handleScheduleVisit}>
-                    📅 Schedule Visit
-                  </button>
-                  <button className="btn btn-outline btn-lg w-full" onClick={handleFavoriteToggle}>
-                    ❤️ Add to Favorites
-                  </button>
-                  <a
-                    href={`https://wa.me/?text=I'm interested in: ${property.title}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn btn-success btn-lg w-full"
+                  <button
+                    className="btn btn-primary btn-lg w-full"
+                    onClick={handleScheduleVisit}
+                    disabled={hasVisitRequest || userMetaLoading}
                   >
-                    💬 Chat on WhatsApp
-                  </a>
+                    {hasVisitRequest ? (
+                      <>
+                        <FiClock className="h-5 w-5" aria-hidden="true" />
+                        Pending Visit Request
+                      </>
+                    ) : (
+                      <>
+                        <FiCalendar className="h-5 w-5" aria-hidden="true" />
+                        Schedule Visit
+                      </>
+                    )}
+                  </button>
+                  <button
+                    className="btn btn-outline btn-lg w-full"
+                    onClick={handleFavoriteToggle}
+                    disabled={userMetaLoading}
+                  >
+                    {isFavorite ? (
+                      <>
+                        <FiX className="h-5 w-5" aria-hidden="true" />
+                        Remove from Favorites
+                      </>
+                    ) : (
+                      <>
+                        <FiHeart className="h-5 w-5" aria-hidden="true" />
+                        Add to Favorites
+                      </>
+                    )}
+                  </button>
                 </div>
 
                 <div className="divider"></div>
                 <div className="text-sm text-base-content/70 space-y-2">
-                  {property.postedAt && <p>🗓️ Posted: {property.postedAt}</p>}
-                  {property.views && <p>👁️ Views: {property.views}</p>}
+                  {property.postedAt && (
+                    <p className="flex items-center gap-2">
+                      <FiCalendar className="h-4 w-4" aria-hidden="true" />
+                      Posted: {property.postedAt}
+                    </p>
+                  )}
+                  {property.views && (
+                    <p className="flex items-center gap-2">
+                      <FiEye className="h-4 w-4" aria-hidden="true" />
+                      Views: {property.views}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>

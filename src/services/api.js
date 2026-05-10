@@ -98,7 +98,7 @@ const notifyAuthChanged = () => {
 };
 
 // =====================================================
-// 🔹 Authentication
+// Authentication
 // =====================================================
 
 export const login = async (email, password) => {
@@ -126,7 +126,7 @@ export const getCurrentUser = async () => {
   try {
     return await apiClient.get('/api/Auth/me');
   } catch (error) {
-    console.error('❌ getCurrentUser error:', error);
+    console.error('getCurrentUser error:', error);
     throw error;
   }
 };
@@ -141,7 +141,7 @@ export const register = async (userData) => {
 };
 
 // =====================================================
-// 🔹 Properties
+// Properties
 // =====================================================
 
 export const getProperties = async (filters = {}) => {
@@ -150,7 +150,7 @@ export const getProperties = async (filters = {}) => {
     const endpoint = `/api/Properties${params ? `?${params}` : ''}`;
     return await apiClient.get(endpoint);
   } catch (error) {
-    console.error('❌ getProperties error:', error);
+    console.error('getProperties error:', error);
     throw error;
   }
 };
@@ -159,7 +159,7 @@ export const getPropertyById = async (id) => {
   try {
     return await apiClient.get(`/api/Properties/${id}`);
   } catch (error) {
-    console.error('❌ getPropertyById error:', error);
+    console.error('getPropertyById error:', error);
     throw error;
   }
 };
@@ -168,20 +168,20 @@ export const createProperty = async (propertyData) => {
   try {
     return await apiClient.post('/api/Properties', propertyData);
   } catch (error) {
-    console.error('❌ createProperty error:', error);
+    console.error('createProperty error:', error);
     throw error;
   }
 };
 
 // =====================================================
-// 🔹 Favorites
+// Favorites
 // =====================================================
 
 export const getFavorites = async () => {
   try {
     return await apiClient.get('/api/Favorites');
   } catch (error) {
-    console.error('❌ getFavorites error:', error);
+    console.error('getFavorites error:', error);
     throw error;
   }
 };
@@ -190,7 +190,7 @@ export const addToFavorites = async (propertyId) => {
   try {
     return await apiClient.post(`/api/Favorites/${propertyId}`);
   } catch (error) {
-    console.error('❌ addToFavorites error:', error);
+    console.error('addToFavorites error:', error);
     throw error;
   }
 };
@@ -199,13 +199,13 @@ export const removeFromFavorites = async (propertyId) => {
   try {
     return await apiClient.delete(`/api/Favorites/${propertyId}`);
   } catch (error) {
-    console.error('❌ removeFromFavorites error:', error);
+    console.error('removeFromFavorites error:', error);
     throw error;
   }
 };
 
 // =====================================================
-// 🔹 Visits
+// Visits
 // =====================================================
 
 export const scheduleVisit = async (propertyId, requestedDate, message = '') => {
@@ -216,7 +216,7 @@ export const scheduleVisit = async (propertyId, requestedDate, message = '') => 
       message: message,
     });
   } catch (error) {
-    console.error('❌ scheduleVisit error:', error);
+    console.error('scheduleVisit error:', error);
     throw error;
   }
 };
@@ -225,20 +225,20 @@ export const getMyVisits = async () => {
   try {
     return await apiClient.get('/api/Visits/my');
   } catch (error) {
-    console.error('❌ getMyVisits error:', error);
+    console.error('getMyVisits error:', error);
     throw error;
   }
 };
 
 // =====================================================
-// 🔹 Reviews
+// Reviews
 // =====================================================
 
 export const getPropertyReviews = async (propertyId) => {
   try {
     return await apiClient.get(`/api/Reviews/property/${propertyId}`);
   } catch (error) {
-    console.error('❌ getPropertyReviews error:', error);
+    console.error('getPropertyReviews error:', error);
     throw error;
   }
 };
@@ -247,7 +247,7 @@ export const createReview = async (propertyId, rating, comment = '') => {
   try {
     return await apiClient.post('/api/Reviews', { propertyId, rating, comment });
   } catch (error) {
-    console.error('❌ createReview error:', error);
+    console.error('createReview error:', error);
     throw error;
   }
 };

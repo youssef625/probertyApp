@@ -11,6 +11,7 @@ const MyProperties = () => {
   const [errorMessages, setErrorMessages] = useState([]);
   const [actionErrors, setActionErrors] = useState([]);
   const [formErrors, setFormErrors] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Modal State
   const [showModal, setShowModal] = useState(false);
@@ -96,19 +97,23 @@ const MyProperties = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isSubmitting) return;
+    setIsSubmitting(true);
     try {
       if (isEditing) {
         await landlordService.updateProperty(currentPropertyId, formData);
       } else {
         await landlordService.createProperty(formData);
       }
-      setShowModal(false);
       setFormErrors([]);
       setActionErrors([]);
+      setShowModal(false);
       fetchProperties();
     } catch (err) {
       console.error(err);
       setFormErrors(getApiErrorMessages(err));
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -276,8 +281,10 @@ const MyProperties = () => {
               </div>
 
               <div className="modal-action">
-                <button type="button" className="btn btn-ghost" onClick={() => setShowModal(false)}>Cancel</button>
-                <button type="submit" className="btn btn-primary">{isEditing ? 'Save Changes' : 'Create Property'}</button>
+                <button type="button" className="btn btn-ghost" onClick={() => setShowModal(false)} disabled={isSubmitting}>Cancel</button>
+                <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
+                  {isSubmitting ? 'Saving...' : (isEditing ? 'Save Changes' : 'Create Property')}
+                </button>
               </div>
             </form>
           </div>

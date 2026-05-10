@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { BuildingIcon, UserPlus, CheckSquare, HelpCircle, LogOut } from 'lucide-react';
-import { login, logout, getUserToken } from '../../services/api';
+import { BuildingIcon, UserPlus, CheckSquare, LogOut } from 'lucide-react';
+import { logout } from '../../services/api';
 import '../admin.css';
 
 const Sidebar = () => {
@@ -9,7 +9,7 @@ const Sidebar = () => {
 
   const handleLogout = () => {
     logout();
-    navigate('/admin/login', { replace: true });
+    navigate('/login', { replace: true });
   };
 
   return (

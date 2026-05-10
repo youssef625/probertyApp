@@ -1,6 +1,15 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { getProperties, logout, hasUserSession, resolveMediaUrl } from '../services/api';
+import {
+  FiDollarSign,
+  FiHeart,
+  FiHome,
+  FiMapPin,
+  FiSearch,
+  FiX,
+} from 'react-icons/fi';
+import { logout, hasUserSession, resolveMediaUrl } from '../services/api';
+import { getPropertiesGql } from '../services/graphqlApi';
 
 const Home = () => {
   const [properties, setProperties] = useState([]);
@@ -17,11 +26,11 @@ const Home = () => {
   const fetchProperties = async (filters = {}) => {
     try {
       setLoading(true);
-      const data = await getProperties(filters);
+      const data = await getPropertiesGql(filters);
       setProperties(data || []);
       setError(null);
     } catch (err) {
-      console.error('API Error:', err);
+      console.error('GraphQL Error:', err);
       setProperties([]);
       setError('Failed to load properties. The API is currently unavailable. Please try again later.');
     } finally {
@@ -71,12 +80,18 @@ const Home = () => {
       <div className="max-w-7xl mx-auto px-6">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-4xl md:text-5xl font-bold">🏠 Available Properties</h1>
+          <h1 className="text-4xl md:text-5xl font-bold flex items-center gap-3">
+            <span className="inline-flex items-center justify-center rounded-full bg-primary/10 text-primary p-2">
+              <FiHome className="h-6 w-6" aria-hidden="true" />
+            </span>
+            Available Properties
+          </h1>
           <div className="flex gap-3">
             {isLoggedIn ? (
               <>
-                <Link to="/favorites" className="btn btn-outline btn-primary">
-                  ❤️ Favorites
+                <Link to="/favorites" className="btn btn-outline btn-primary gap-2">
+                  <FiHeart className="h-4 w-4" aria-hidden="true" />
+                  Favorites
                 </Link>
                 <button onClick={handleLogout} className="btn btn-outline">
                   Log out
@@ -95,7 +110,10 @@ const Home = () => {
         <form onSubmit={handleSearch} className="card bg-base-100 shadow-lg p-6 mb-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
-              <label className="label text-sm">📍 Location</label>
+              <label className="label text-sm flex items-center gap-2">
+                <FiMapPin className="h-4 w-4 text-primary" aria-hidden="true" />
+                Location
+              </label>
               <input
                 type="text"
                 value={searchLocation}
@@ -105,7 +123,10 @@ const Home = () => {
               />
             </div>
             <div>
-              <label className="label text-sm">💰 Price range</label>
+              <label className="label text-sm flex items-center gap-2">
+                <FiDollarSign className="h-4 w-4 text-primary" aria-hidden="true" />
+                Price range
+              </label>
               <select
                 value={priceRange}
                 onChange={(e) => setPriceRange(e.target.value)}
@@ -120,7 +141,10 @@ const Home = () => {
               </select>
             </div>
             <div>
-              <label className="label text-sm">🏢 Property type</label>
+              <label className="label text-sm flex items-center gap-2">
+                <FiHome className="h-4 w-4 text-primary" aria-hidden="true" />
+                Property type
+              </label>
               <select
                 value={propertyType}
                 onChange={(e) => setPropertyType(e.target.value)}
@@ -135,8 +159,18 @@ const Home = () => {
               </select>
             </div>
             <div className="flex items-end gap-2">
-              <button type="submit" className="btn btn-primary flex-1">🔍 Search</button>
-              <button type="button" onClick={handleClearFilters} className="btn btn-ghost">✕</button>
+              <button type="submit" className="btn btn-primary flex-1 gap-2">
+                <FiSearch className="h-4 w-4" aria-hidden="true" />
+                Search
+              </button>
+              <button
+                type="button"
+                onClick={handleClearFilters}
+                className="btn btn-ghost"
+                aria-label="Clear filters"
+              >
+                <FiX className="h-4 w-4" aria-hidden="true" />
+              </button>
             </div>
           </div>
         </form>
@@ -168,7 +202,10 @@ const Home = () => {
                   <p className="text-3xl font-bold text-purple-600">
                     {prop.price?.toLocaleString()} EGP <span className="text-base">monthly</span>
                   </p>
-                  <p className="text-sm text-gray-500">📍 {prop.location}</p>
+                  <p className="text-sm text-gray-500 flex items-center gap-2">
+                    <FiMapPin className="h-4 w-4" aria-hidden="true" />
+                    {prop.location}
+                  </p>
                   <div className="flex gap-2 mt-2">
                     {prop.propertyType && (
                       <span className="badge badge-outline">{prop.propertyType}</span>

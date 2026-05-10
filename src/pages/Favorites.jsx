@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { FiArrowLeft, FiHeart, FiMapPin, FiX } from 'react-icons/fi';
 import { getFavorites, removeFromFavorites, hasUserSession, resolveMediaUrl } from '../services/api';
 import ErrorBanner from '../components/ErrorBanner';
 import { getApiErrorMessages } from '../utils/apiClient';
@@ -61,8 +62,16 @@ const Favorites = () => {
       <div className="max-w-7xl mx-auto px-6">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-4xl md:text-5xl font-bold text-primary">❤️ Favorites</h1>
-          <Link to="/" className="btn btn-outline">Back to Home</Link>
+          <h1 className="text-4xl md:text-5xl font-bold text-primary flex items-center gap-3">
+            <span className="inline-flex items-center justify-center rounded-full bg-primary/10 text-primary p-2">
+              <FiHeart className="h-6 w-6" aria-hidden="true" />
+            </span>
+            Favorites
+          </h1>
+          <Link to="/" className="btn btn-outline gap-2">
+            <FiArrowLeft className="h-4 w-4" aria-hidden="true" />
+            Back to Home
+          </Link>
         </div>
 
         <ErrorBanner messages={pageErrors} className="mb-4" />
@@ -92,8 +101,9 @@ const Favorites = () => {
                   onClick={(e) => handleRemove(e, propertyId)}
                   className="btn btn-circle btn-sm btn-error absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity"
                   title="Remove from favorites"
+                  aria-label="Remove from favorites"
                 >
-                  ✕
+                  <FiX className="h-4 w-4" aria-hidden="true" />
                 </button>
 
                 <figure className="h-56">
@@ -109,7 +119,10 @@ const Favorites = () => {
                   <p className="text-3xl font-bold text-purple-600">
                     {prop.price?.toLocaleString()} EGP <span className="text-base">monthly</span>
                   </p>
-                  <p className="text-sm text-gray-500 truncate">📍 {prop.location}</p>
+                  <p className="text-sm text-gray-500 truncate flex items-center gap-2">
+                    <FiMapPin className="h-4 w-4" aria-hidden="true" />
+                    {prop.location}
+                  </p>
                 </div>
               </Link>
             )})}
