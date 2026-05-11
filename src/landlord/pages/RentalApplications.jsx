@@ -5,13 +5,28 @@ import ErrorBanner from '../../components/ErrorBanner';
 import { getApiBaseUrl, getApiErrorMessages } from '../../utils/apiClient';
 
 const API_BASE_URL = getApiBaseUrl();
-const resolveDocumentUrl = (doc) => doc.startsWith('http') ? doc : `${API_BASE_URL}${doc}`;
+const getDocumentUrl = (applicationId, documentId) => `${API_BASE_URL}/api/Applications/${applicationId}/documents/${documentId}`;
 
 const RentalApplications = () => {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [errorMessages, setErrorMessages] = useState([]);
   const [actionErrors, setActionErrors] = useState([]);
+
+  const formatDateRange = (start, end) => {
+    const startDate = start ? new Date(start) : null;
+    const endDate = end ? new Date(end) : null;
+    const hasValidStart = startDate && !Number.isNaN(startDate.getTime());
+    const hasValidEnd = endDate && !Number.isNaN(endDate.getTime());
+
+    if (!hasValidStart && !hasValidEnd) return 'Not provided';
+
+    const formatOptions = { year: 'numeric', month: 'short', day: 'numeric' };
+    const startLabel = hasValidStart ? startDate.toLocaleDateString(undefined, formatOptions) : 'N/A';
+    const endLabel = hasValidEnd ? endDate.toLocaleDateString(undefined, formatOptions) : 'N/A';
+
+    return `${startLabel} - ${endLabel}`;
+  };
 
   const fetchApplications = async () => {
     try {
@@ -63,7 +78,9 @@ const RentalApplications = () => {
             No rental applications received yet.
           </div>
         ) : (
-          applications.map(app => (
+          applications.map(app => {
+            const tenantName = (app?.tenantName ?? app?.TenantName ?? '').toString().trim();
+            return (
             <div key={app.id} className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col md:flex-row">
               {/* Left side: Info */}
               <div className="p-6 flex-1 flex flex-col justify-between">
@@ -71,7 +88,7 @@ const RentalApplications = () => {
                   <div className="flex justify-between items-start mb-4">
                     <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
                       <User size={20} className="text-slate-400" />
-                      {app.applicantName || 'Anonymous Applicant'}
+                      {tenantName || 'Anonymous Applicant'}
                     </h2>
                     <div className={`badge ${
                       app.status === 'Approved' ? 'badge-success' : 
@@ -90,6 +107,12 @@ const RentalApplications = () => {
                       <Calendar size={16} className="text-slate-400" />
                       <span>Applied: {new Date(app.createdAt || Date.now()).toLocaleDateString()}</span>
                     </div>
+                    <div className="flex items-center gap-2">
+                      <Calendar size={16} className="text-slate-400" />
+                      <span>
+                        Rental period: {formatDateRange(app.rentalStartDate ?? app.RentalStartDate, app.rentalEndDate ?? app.RentalEndDate)}
+                      </span>
+                    </div>
                     {app.message && (
                       <div className="col-span-full mt-2 bg-slate-50 p-3 rounded text-slate-700 italic border-l-4 border-indigo-200">
                         "{app.message}"
@@ -99,26 +122,30 @@ const RentalApplications = () => {
                 </div>
 
                 {/* Documents section */}
-                {app.documentUrls && app.documentUrls.length > 0 && (
+                {(() => {
+                  const documents = app.documents || app.Documents || [];
+                  if (documents.length === 0) return null;
+                  return (
                   <div className="mt-4 pt-4 border-t border-slate-100">
                     <h3 className="text-sm font-semibold text-slate-800 mb-2 flex items-center gap-2">
                       <FileText size={16} /> Attached Documents
                     </h3>
                     <div className="flex flex-wrap gap-2">
-                      {app.documentUrls.map((doc, idx) => (
+                      {documents.map((doc, idx) => (
                         <a 
-                          key={idx} 
-                          href={resolveDocumentUrl(doc)} 
+                          key={doc?.id || doc?.Id || idx} 
+                          href={getDocumentUrl(app.id, doc?.id ?? doc?.Id)} 
                           target="_blank" 
                           rel="noopener noreferrer"
                           className="btn btn-xs btn-outline btn-primary"
                         >
-                          View Document {idx + 1}
+                          {doc?.fileName || doc?.FileName || `Document ${idx + 1}`}
                         </a>
                       ))}
                     </div>
                   </div>
-                )}
+                  );
+                })()}
               </div>
 
               {/* Right side: Actions */}
@@ -151,7 +178,8 @@ const RentalApplications = () => {
                 )}
               </div>
             </div>
-          ))
+            );
+          })
         )}
       </div>
     </div>

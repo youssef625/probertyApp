@@ -59,7 +59,9 @@ const VisitRequests = () => {
             No visit requests pending at the moment.
           </div>
         ) : (
-          requests.map(request => (
+          requests.map(request => {
+            const tenantName = (request?.tenantName ?? request?.TenantName ?? '').toString().trim();
+            return (
             <div key={request.id} className="card bg-white shadow-sm border border-slate-200">
               <div className="card-body p-5">
                 <div className="flex justify-between items-start mb-2">
@@ -72,7 +74,7 @@ const VisitRequests = () => {
                   </div>
                 </div>
                 
-                <p className="text-sm font-medium text-slate-700 mb-4">By: {request.tenantName || 'Anonymous'}</p>
+                <p className="text-sm font-medium text-slate-700 mb-4">By: {tenantName || 'Anonymous'}</p>
 
                 <div className="bg-slate-50 rounded-lg p-3 text-sm space-y-2 mb-4">
                   <div className="flex items-start gap-2">
@@ -107,7 +109,8 @@ const VisitRequests = () => {
                 </div>
               </div>
             </div>
-          ))
+            );
+          })
         )}
       </div>
     </div>

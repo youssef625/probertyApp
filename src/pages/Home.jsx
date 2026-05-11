@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import {
   FiDollarSign,
   FiHeart,
@@ -8,14 +8,15 @@ import {
   FiSearch,
   FiX,
 } from 'react-icons/fi';
-import { logout, hasUserSession, resolveMediaUrl } from '../services/api';
+import { hasUserSession, resolveMediaUrl } from '../services/api';
+import notAvailableImage from '../assets/not-available.svg';
 import { getPropertiesGql } from '../services/graphqlApi';
+import TenantNavbar from '../components/TenantNavbar';
 
 const Home = () => {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const navigate = useNavigate();
   const isLoggedIn = hasUserSession();
 
   // Search/filter state
@@ -23,11 +24,17 @@ const Home = () => {
   const [priceRange, setPriceRange] = useState('');
   const [propertyType, setPropertyType] = useState('');
 
+  const isRentedProperty = (property) => {
+    const statusValue = (property?.rentalStatus ?? property?.status ?? '').toString().toLowerCase();
+    return statusValue === 'rented';
+  };
+
   const fetchProperties = async (filters = {}) => {
     try {
       setLoading(true);
       const data = await getPropertiesGql(filters);
-      setProperties(data || []);
+      const propertyList = Array.isArray(data) ? data : [];
+      setProperties(propertyList.filter((property) => !isRentedProperty(property)));
       setError(null);
     } catch (err) {
       console.error('GraphQL Error:', err);
@@ -62,11 +69,6 @@ const Home = () => {
     fetchProperties();
   };
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login', { replace: true });
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-base-200">
@@ -76,8 +78,9 @@ const Home = () => {
   }
 
   return (
-    <div className="min-h-screen bg-base-200 py-12">
-      <div className="max-w-7xl mx-auto px-6">
+    <div className="min-h-screen bg-base-200">
+      <TenantNavbar />
+      <div className="max-w-7xl mx-auto px-6 py-12">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-4xl md:text-5xl font-bold flex items-center gap-3">
@@ -88,15 +91,10 @@ const Home = () => {
           </h1>
           <div className="flex gap-3">
             {isLoggedIn ? (
-              <>
-                <Link to="/favorites" className="btn btn-outline btn-primary gap-2">
-                  <FiHeart className="h-4 w-4" aria-hidden="true" />
-                  Favorites
-                </Link>
-                <button onClick={handleLogout} className="btn btn-outline">
-                  Log out
-                </button>
-              </>
+              <Link to="/favorites" className="btn btn-outline btn-primary gap-2">
+                <FiHeart className="h-4 w-4" aria-hidden="true" />
+                Favorites
+              </Link>
             ) : (
               <>
                 <Link to="/login" className="btn btn-primary">Sign in</Link>
@@ -192,7 +190,7 @@ const Home = () => {
               >
                 <figure className="h-56">
                   <img 
-                    src={resolveMediaUrl(prop.images?.[0] || prop.imageUrls?.[0]) || 'https://via.placeholder.com/600x400?text=Apartment'} 
+                    src={resolveMediaUrl(prop.images?.[0] || prop.imageUrls?.[0]) || notAvailableImage}
                     alt={prop.title}
                     className="w-full h-full object-cover"
                   />

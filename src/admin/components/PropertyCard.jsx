@@ -1,12 +1,13 @@
 import React from 'react';
 import { MapPin, CheckCircle, XCircle } from 'lucide-react';
+import notAvailableImage from '../../assets/not-available.svg';
 import '../admin.css';
 
 const PropertyCard = ({ property, onAccept, onReject }) => {
   return (
     <div className="property-card">
       <div className="property-image-wrapper">
-        <img src={property?.image || 'https://via.placeholder.com/400x300?text=No+Image'} alt={property?.title || 'Property'} className="property-image" />
+        <img src={property?.image || notAvailableImage} alt={property?.title || 'Property'} className="property-image" />
         <div className={`property-badge ${property?.status === 'URGENT REVIEW' ? 'urgent' : ''}`}>
           {property?.status || 'NEW SUBMISSION'}
         </div>

@@ -5,6 +5,7 @@ import PropertyCard from '../components/PropertyCard';
 import ErrorBanner from '../../components/ErrorBanner';
 import { getApiBaseUrl, getApiErrorMessages } from '../../utils/apiClient';
 import { adminService } from '../services/adminService';
+import notAvailableImage from '../../assets/not-available.svg';
 import '../admin.css';
 
 const API_BASE_URL = getApiBaseUrl();
@@ -28,7 +29,7 @@ const PropertyApprovals = () => {
         price: item.price ? `$${item.price.toLocaleString()}/mo` : '$0/mo',
         image: item.imageUrls && item.imageUrls.length > 0 
           ? `${API_BASE_URL}${item.imageUrls[0]}` 
-          : 'https://via.placeholder.com/400x300?text=No+Image',
+          : notAvailableImage,
         status: item.approvalStatus === 'Pending' ? 'NEW SUBMISSION' : (item.approvalStatus || 'NEW SUBMISSION'),
         landlord: {
           name: item.landlordName || 'Unknown Landlord',
@@ -61,12 +62,7 @@ const PropertyApprovals = () => {
     }
   };
 
-  const filteredProperties = properties.filter(p => {
-    if (activeTab === 'All Requests') return true;
-    if (activeTab === 'Urgent') return p.status === 'URGENT REVIEW' || p.isUrgent;
-    if (activeTab === 'Flagged') return p.status === 'RE-SUBMISSION' || p.isFlagged;
-    return true;
-  });
+  const filteredProperties = properties;
 
   return (
     <div className="page-wrapper">
@@ -78,15 +74,12 @@ const PropertyApprovals = () => {
       <ErrorBanner messages={actionErrors} className="mb-6" />
 
       <div className="tabs-container">
-        {['All Requests', 'Urgent', 'Flagged'].map((tab) => (
-          <button 
-            key={tab}
-            className={`tab-btn ${activeTab === tab ? 'active' : ''}`}
-            onClick={() => setActiveTab(tab)}
-          >
-            {tab}
-          </button>
-        ))}
+        <button
+          className={`tab-btn ${activeTab === 'All Requests' ? 'active' : ''}`}
+          onClick={() => setActiveTab('All Requests')}
+        >
+          All Requests
+        </button>
       </div>
 
       <div className="property-grid">
@@ -106,16 +99,6 @@ const PropertyApprovals = () => {
           />
         ))}
         
-        {/* Placeholder Card for "Pending Integration" as in UI */}
-        <div className="property-card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '350px', border: '2px dashed #e2e4ea', boxShadow: 'none' }}>
-          <div style={{ textAlign: 'center', color: '#718096' }}>
-            <div style={{ background: '#f7f8fc', width: '60px', height: '60px', borderRadius: '50%', margin: '0 auto 16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-            </div>
-            <h3 style={{ fontSize: '1.1rem', margin: '0 0 8px 0', color: '#2d3748' }}>Pending Integration</h3>
-            <p style={{ fontSize: '0.85rem' }}>New listings will automatically<br/>appear here for verification.</p>
-          </div>
-        </div>
       </div>
 
       <div className="table-footer" style={{ marginTop: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

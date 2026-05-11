@@ -4,6 +4,8 @@ import { FiArrowLeft, FiHeart, FiMapPin, FiX } from 'react-icons/fi';
 import { getFavorites, removeFromFavorites, hasUserSession, resolveMediaUrl } from '../services/api';
 import ErrorBanner from '../components/ErrorBanner';
 import { getApiErrorMessages } from '../utils/apiClient';
+import TenantNavbar from '../components/TenantNavbar';
+import notAvailableImage from '../assets/not-available.svg';
 
 const Favorites = () => {
   const [favorites, setFavorites] = useState([]);
@@ -11,6 +13,16 @@ const Favorites = () => {
   const [pageErrors, setPageErrors] = useState([]);
   const [actionErrors, setActionErrors] = useState([]);
   const navigate = useNavigate();
+
+  const isRentedProperty = (property) => {
+    const statusValue = (property?.rentalStatus ?? property?.status ?? '').toString().toLowerCase();
+    return statusValue === 'rented';
+  };
+
+  const visibleFavorites = favorites.filter((fav) => {
+    const prop = fav.property || fav;
+    return !isRentedProperty(prop);
+  });
 
   const fetchFavorites = async () => {
     try {
@@ -51,15 +63,19 @@ const Favorites = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-base-200">
-        <span className="loading loading-spinner loading-lg text-primary"></span>
-      </div>
+      <>
+        <TenantNavbar />
+        <div className="min-h-screen flex items-center justify-center bg-base-200">
+          <span className="loading loading-spinner loading-lg text-primary"></span>
+        </div>
+      </>
     );
   }
 
   return (
-    <div className="min-h-screen bg-base-200 py-12">
-      <div className="max-w-7xl mx-auto px-6">
+    <div className="min-h-screen bg-base-200">
+      <TenantNavbar />
+      <div className="max-w-7xl mx-auto px-6 py-12">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-4xl md:text-5xl font-bold text-primary flex items-center gap-3">
@@ -78,14 +94,14 @@ const Favorites = () => {
         <ErrorBanner messages={actionErrors} className="mb-6" />
 
         {/* Favorite Grid */}
-        {favorites.length === 0 && pageErrors.length === 0 ? (
+        {visibleFavorites.length === 0 && pageErrors.length === 0 ? (
           <div className="text-center py-20">
             <h2 className="text-2xl font-semibold mb-4 text-base-content/70">No properties in favorites</h2>
             <Link to="/" className="btn btn-primary">Browse properties</Link>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {favorites.map((fav) => {
+            {visibleFavorites.map((fav) => {
               // Handle potential mismatches between favorites DTO and property model
               const propertyId = fav.propertyId || fav.id;
               const prop = fav.property || fav; 
@@ -108,10 +124,10 @@ const Favorites = () => {
 
                 <figure className="h-56">
                   <img 
-                    src={resolveMediaUrl(prop.images?.[0] || prop.imageUrls?.[0] || prop.imageUrl) || 'https://via.placeholder.com/600x400?text=Apartment'} 
+                    src={resolveMediaUrl(prop.images?.[0] || prop.imageUrls?.[0] || prop.imageUrl) || notAvailableImage}
                     alt={prop.title}
                     className="w-full h-full object-cover"
-                    onError={(e) => { e.target.src = 'https://via.placeholder.com/600x400?text=No+Image'; }}
+                    onError={(e) => { e.target.src = notAvailableImage; }}
                   />
                 </figure>
                 <div className="card-body">

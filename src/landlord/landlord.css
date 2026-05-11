@@ -145,6 +145,15 @@
   border: 2px solid white;
 }
 
+.notification-dropdown {
+  max-height: 70vh;
+}
+
+.notification-list {
+  max-height: 320px;
+  overflow-y: auto;
+}
+
 .user-profile {
   display: flex;
   align-items: center;
@@ -184,4 +193,9 @@
 .landlord-content {
   padding: 32px;
   flex: 1;
+}
+
+.landlord-content h1,
+.landlord-content h2 {
+  color: #0f172a;
 }

@@ -20,6 +20,7 @@ import Register from './pages/Register'
 import Home from './pages/Home'
 import PropertyView from './pages/PropertyView'
 import Favorites from './pages/Favorites'
+import MyApplications from './pages/MyApplications'
 
 // A wrapper for routes that need authentication
 const AdminProtectedRoute = ({ children }) => {
@@ -85,8 +86,9 @@ function App() {
           <Route path="/login" element={<UserGuestRoute><Login /></UserGuestRoute>} />
           <Route path="/register" element={<UserGuestRoute><Register /></UserGuestRoute>} />
           <Route path="/" element={<PublicUserRoute><Home /></PublicUserRoute>} />
-          <Route path="/property/:id" element={<UserProtectedRoute><PropertyView /></UserProtectedRoute>} />
+          <Route path="/property/:id" element={<PublicUserRoute><PropertyView /></PublicUserRoute>} />
           <Route path="/favorites" element={<UserProtectedRoute><Favorites /></UserProtectedRoute>} />
+          <Route path="/my-applications" element={<UserProtectedRoute><MyApplications /></UserProtectedRoute>} />
 
           {/* Admin */}
           <Route path="/admin" element={<AdminProtectedRoute><AdminLayout /></AdminProtectedRoute>}>

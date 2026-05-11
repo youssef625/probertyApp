@@ -141,6 +141,20 @@ export const register = async (userData) => {
 };
 
 // =====================================================
+// Notifications
+// =====================================================
+
+export const getMyNotifications = async (limit = 5) => {
+  try {
+    const safeLimit = Number.isFinite(limit) ? Math.max(1, Math.min(50, limit)) : 5;
+    return await apiClient.get(`/api/Notifications?limit=${safeLimit}`);
+  } catch (error) {
+    console.error('getMyNotifications error:', error);
+    throw error;
+  }
+};
+
+// =====================================================
 // Properties
 // =====================================================
 
@@ -201,6 +215,64 @@ export const removeFromFavorites = async (propertyId) => {
   } catch (error) {
     console.error('removeFromFavorites error:', error);
     throw error;
+  }
+};
+
+// =====================================================
+// Applications
+// =====================================================
+
+export const getMyApplications = async () => {
+  try {
+    return await apiClient.get('/api/Applications/my');
+  } catch (error) {
+    console.error('getMyApplications error:', error);
+    throw error;
+  }
+};
+
+export const createApplication = async (propertyId, rentalStartDate, rentalEndDate, message = '') => {
+  try {
+    return await apiClient.post('/api/Applications', {
+      propertyId: parseInt(propertyId),
+      rentalStartDate,
+      rentalEndDate,
+      message,
+    });
+  } catch (error) {
+    console.error('createApplication error:', error);
+    throw error;
+  }
+};
+
+export const uploadApplicationDocuments = async (applicationId, files = []) => {
+  const formData = new FormData();
+  files.forEach((file) => formData.append('files', file));
+
+  const token = getUserToken();
+  const response = await fetch(`${API_ORIGIN}/api/Applications/${applicationId}/documents`, {
+    method: 'POST',
+    headers: {
+      ...(token && { 'Authorization': `Bearer ${token}` }),
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    let message = `HTTP Error: ${response.status}`;
+    try {
+      const data = await response.json();
+      message = data?.message || data?.title || data?.error || message;
+    } catch {
+      // ignore parsing errors
+    }
+    throw new Error(message);
+  }
+
+  try {
+    return await response.json();
+  } catch {
+    return true;
   }
 };
 

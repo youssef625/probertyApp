@@ -3,6 +3,7 @@ import { Outlet } from 'react-router-dom';
 import { Bell, Search } from 'lucide-react';
 import LandlordSidebar from './LandlordSidebar';
 import { socketService } from '../../services/socketService';
+import { getMyNotifications, hasUserSession } from '../../services/api';
 import '../landlord.css';
 
 const LandlordLayout = () => {
@@ -10,13 +11,35 @@ const LandlordLayout = () => {
   const [showNotifications, setShowNotifications] = useState(false);
 
   useEffect(() => {
+    let isActive = true;
+
+    const loadNotifications = async () => {
+      if (!hasUserSession()) return;
+      try {
+        const data = await getMyNotifications(20);
+        if (!isActive) return;
+
+        const items = Array.isArray(data) ? data : [];
+        const normalized = items.map((item, index) => ({
+          id: item?.id ?? item?.Id ?? Date.now() + index,
+          message: item?.message ?? item?.Message ?? '',
+          read: Boolean(item?.isRead ?? item?.IsRead)
+        }));
+        setNotifications(normalized.slice(0, 20));
+      } catch (error) {
+        console.error('Failed to load notifications:', error);
+      }
+    };
+
+    loadNotifications();
+
     // Connect to SignalR socket on mount
     socketService.connect();
 
     const handleNewNotification = (data) => {
       // Backend sends an object: { Id, Message, Type, ReferenceId, CreatedAt, IsRead }
       const text = typeof data === 'string' ? data : (data?.Message || data?.message || JSON.stringify(data));
-      setNotifications(prev => [{ id: data?.Id || Date.now(), message: text, read: false }, ...prev].slice(0, 5)); // Keep last 5
+      setNotifications(prev => [{ id: data?.Id || Date.now(), message: text, read: false }, ...prev].slice(0, 20)); // Keep last 20
     };
 
     // Listen to standard events we expect the backend to emit
@@ -25,6 +48,7 @@ const LandlordLayout = () => {
     socketService.on('ApplicationReceived', (msg) => handleNewNotification(`New application: ${msg}`));
 
     return () => {
+      isActive = false;
       socketService.off('ReceiveNotification', handleNewNotification);
       socketService.off('VisitRequested', handleNewNotification);
       socketService.off('ApplicationReceived', handleNewNotification);
@@ -57,11 +81,11 @@ const LandlordLayout = () => {
               
               {/* Notification Dropdown */}
               {showNotifications && (
-                <div className="absolute right-0 mt-4 w-72 bg-white rounded-xl shadow-lg border border-slate-200 z-50">
+                <div className="notification-dropdown absolute right-0 mt-4 w-72 bg-white rounded-xl shadow-lg border border-slate-200 z-50">
                   <div className="p-4 border-b border-slate-100 font-semibold text-slate-800">
                     Notifications
                   </div>
-                  <div className="max-h-64 overflow-y-auto">
+                  <div className="notification-list">
                     {notifications.length === 0 ? (
                       <div className="p-4 text-center text-sm text-slate-500">No new notifications</div>
                     ) : (
