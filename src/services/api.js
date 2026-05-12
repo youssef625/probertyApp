@@ -276,6 +276,41 @@ export const uploadApplicationDocuments = async (applicationId, files = []) => {
   }
 };
 
+export const uploadPropertyImages = async (propertyId, files = []) => {
+  if (!propertyId || files.length === 0) {
+    return { imageUrls: [] };
+  }
+
+  const formData = new FormData();
+  files.forEach((file) => formData.append('files', file));
+
+  const token = getUserToken();
+  const response = await fetch(`${API_ORIGIN}/api/Properties/${propertyId}/images`, {
+    method: 'POST',
+    headers: {
+      ...(token && { 'Authorization': `Bearer ${token}` }),
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    let message = `HTTP Error: ${response.status}`;
+    try {
+      const data = await response.json();
+      message = data?.message || data?.title || data?.error || message;
+    } catch {
+      
+    }
+    throw new Error(message);
+  }
+
+  try {
+    return await response.json();
+  } catch {
+    return true;
+  }
+};
+
 
 
 

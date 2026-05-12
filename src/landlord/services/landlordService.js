@@ -1,5 +1,6 @@
 import { apiClient } from '../../utils/apiClient';
 import { createPropertyGql, updatePropertyGql, deletePropertyGql } from '../../services/graphqlApi';
+import { uploadPropertyImages } from '../../services/api';
 
 export const landlordService = {
   
@@ -20,6 +21,10 @@ export const landlordService = {
   
   deleteProperty: async (id) => {
     return await deletePropertyGql(id);
+  },
+
+  uploadPropertyImages: async (propertyId, files = []) => {
+    return await uploadPropertyImages(propertyId, files);
   },
 
   

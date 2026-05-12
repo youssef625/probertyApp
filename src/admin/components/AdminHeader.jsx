@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Bell, Settings, LogOut } from 'lucide-react';
+import { Bell, Settings, LogOut } from 'lucide-react';
 import { logout } from '../../services/api';
 import { socketService } from '../../services/socketService';
 import '../admin.css';
@@ -48,11 +48,6 @@ const AdminHeader = () => {
 
   return (
     <header className="admin-header">
-      <div className="header-search">
-        <Search className="search-icon" size={18} />
-        <input type="text" placeholder="Search properties or landlords..." />
-      </div>
-      
       <div className="header-actions">
         <div className="relative">
           <button className="icon-btn" onClick={toggleNotifications} aria-label="Notifications">

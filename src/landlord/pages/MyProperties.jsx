@@ -30,11 +30,11 @@ const MyProperties = () => {
     areaSqFt: '',
     bedrooms: '',
     bathrooms: '',
-    rentalStatus: 'Available',
     hasParking: false,
     hasElevator: false,
     isFurnished: false
   });
+  const [imageFiles, setImageFiles] = useState([]);
 
   const fetchProperties = async () => {
     try {
@@ -76,9 +76,10 @@ const MyProperties = () => {
     setIsEditing(false);
     setCurrentPropertyId(null);
     setFormErrors([]);
+    setImageFiles([]);
     setFormData({
       title: '', description: '', price: '', location: '', propertyType: 'Apartment',
-      areaSqFt: '', bedrooms: '', bathrooms: '', rentalStatus: 'Available',
+      areaSqFt: '', bedrooms: '', bathrooms: '',
       hasParking: false, hasElevator: false, isFurnished: false
     });
     setShowModal(true);
@@ -88,6 +89,7 @@ const MyProperties = () => {
     setIsEditing(true);
     setCurrentPropertyId(property.id);
     setFormErrors([]);
+    setImageFiles([]);
     setFormData({
       title: property.title || '',
       description: property.description || '',
@@ -97,7 +99,6 @@ const MyProperties = () => {
       areaSqFt: property.areaSqFt || property.area || '',
       bedrooms: property.bedrooms || '',
       bathrooms: property.bathrooms || '',
-      rentalStatus: property.rentalStatus || property.status || 'Available',
       hasParking: property.hasParking || false,
       hasElevator: property.hasElevator || false,
       isFurnished: property.isFurnished || false
@@ -148,10 +149,20 @@ const MyProperties = () => {
 
     setIsSubmitting(true);
     try {
+      let propertyId = currentPropertyId;
       if (isEditing) {
         await landlordService.updateProperty(currentPropertyId, formData);
       } else {
-        await landlordService.createProperty(formData);
+        const created = await landlordService.createProperty(formData);
+        propertyId = created?.id || created?.propertyId || propertyId;
+      }
+
+      if (imageFiles.length > 0) {
+        if (!propertyId) {
+          throw new Error('Property id missing for image upload.');
+        }
+        await landlordService.uploadPropertyImages(propertyId, imageFiles);
+        setImageFiles([]);
       }
       setFormErrors([]);
       setActionErrors([]);
@@ -295,6 +306,19 @@ const MyProperties = () => {
                   <label className="label"><span className="label-text font-medium">Description</span></label>
                   <textarea name="description" value={formData.description} onChange={handleInputChange} className="textarea textarea-bordered h-24" maxLength={2000} required></textarea>
                 </div>
+                <div className="form-control md:col-span-2">
+                  <label className="label"><span className="label-text font-medium">Images</span></label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={(event) => setImageFiles(Array.from(event.target.files || []))}
+                    className="file-input file-input-bordered w-full"
+                  />
+                  <span className="text-xs text-slate-500 mt-1">
+                    {imageFiles.length > 0 ? `${imageFiles.length} file(s) selected` : 'Optional. Add after saving if you prefer.'}
+                  </span>
+                </div>
                 <div className="form-control">
                   <label className="label"><span className="label-text font-medium">Property Type</span></label>
                   <select name="propertyType" value={formData.propertyType} onChange={handleInputChange} className="select select-bordered" required>
@@ -305,13 +329,6 @@ const MyProperties = () => {
                     <option value="Villa">Villa</option>
                     <option value="Townhouse">Townhouse</option>
                     <option value="Other">Other</option>
-                  </select>
-                </div>
-                <div className="form-control">
-                  <label className="label"><span className="label-text font-medium">Rental Status</span></label>
-                  <select name="rentalStatus" value={formData.rentalStatus} onChange={handleInputChange} className="select select-bordered" required>
-                    <option value="Available">Available</option>
-                    <option value="Rented">Rented</option>
                   </select>
                 </div>
                 <div className="form-control">

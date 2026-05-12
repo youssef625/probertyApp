@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
-import { Bell, Search } from 'lucide-react';
+import { Bell } from 'lucide-react';
 import LandlordSidebar from './LandlordSidebar';
 import { socketService } from '../../services/socketService';
 import { getMyNotifications, hasUserSession } from '../../services/api';
@@ -72,9 +72,6 @@ const LandlordLayout = () => {
         {}
         <header className="landlord-header">
           <div className="header-actions">
-            <div className="header-icon">
-              <Search size={20} />
-            </div>
             <div className="header-icon relative" onClick={toggleNotifications}>
               <Bell size={20} />
               {unreadCount > 0 && <span className="notification-badge">{unreadCount}</span>}
