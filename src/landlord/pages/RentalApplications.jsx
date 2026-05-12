@@ -55,7 +55,7 @@ const RentalApplications = () => {
         setActionErrors([]);
       } catch (err) {
         setActionErrors(getApiErrorMessages(err));
-        fetchApplications(); // revert
+        fetchApplications(); 
       }
     }
   };
@@ -82,7 +82,7 @@ const RentalApplications = () => {
             const tenantName = (app?.tenantName ?? app?.TenantName ?? '').toString().trim();
             return (
             <div key={app.id} className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col md:flex-row">
-              {/* Left side: Info */}
+              {}
               <div className="p-6 flex-1 flex flex-col justify-between">
                 <div>
                   <div className="flex justify-between items-start mb-4">
@@ -121,7 +121,7 @@ const RentalApplications = () => {
                   </div>
                 </div>
 
-                {/* Documents section */}
+                {}
                 {(() => {
                   const documents = app.documents || app.Documents || [];
                   if (documents.length === 0) return null;
@@ -148,7 +148,7 @@ const RentalApplications = () => {
                 })()}
               </div>
 
-              {/* Right side: Actions */}
+              {}
               <div className="bg-slate-50 p-6 md:w-64 border-t md:border-t-0 md:border-l border-slate-200 flex flex-col justify-center gap-3">
                 {(!app.status || app.status === 'Pending') ? (
                   <>

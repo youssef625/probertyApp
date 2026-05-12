@@ -33,16 +33,16 @@ const LandlordLayout = () => {
 
     loadNotifications();
 
-    // Connect to SignalR socket on mount
+    
     socketService.connect();
 
     const handleNewNotification = (data) => {
-      // Backend sends an object: { Id, Message, Type, ReferenceId, CreatedAt, IsRead }
+      
       const text = typeof data === 'string' ? data : (data?.Message || data?.message || JSON.stringify(data));
-      setNotifications(prev => [{ id: data?.Id || Date.now(), message: text, read: false }, ...prev].slice(0, 20)); // Keep last 20
+      setNotifications(prev => [{ id: data?.Id || Date.now(), message: text, read: false }, ...prev].slice(0, 20)); 
     };
 
-    // Listen to standard events we expect the backend to emit
+    
     socketService.on('ReceiveNotification', handleNewNotification);
     socketService.on('VisitRequested', (msg) => handleNewNotification(`Visit request: ${msg}`));
     socketService.on('ApplicationReceived', (msg) => handleNewNotification(`New application: ${msg}`));
@@ -61,7 +61,7 @@ const LandlordLayout = () => {
   const toggleNotifications = () => {
     setShowNotifications(!showNotifications);
     if (!showNotifications && unreadCount > 0) {
-      // Mark all as read when opening dropdown
+      
       setNotifications(prev => prev.map(n => ({ ...n, read: true })));
     }
   };
@@ -69,7 +69,7 @@ const LandlordLayout = () => {
     <div className="landlord-layout">
       <LandlordSidebar />
       <main className="landlord-main">
-        {/* Simple Header */}
+        {}
         <header className="landlord-header">
           <div className="header-actions">
             <div className="header-icon">
@@ -79,7 +79,7 @@ const LandlordLayout = () => {
               <Bell size={20} />
               {unreadCount > 0 && <span className="notification-badge">{unreadCount}</span>}
               
-              {/* Notification Dropdown */}
+              {}
               {showNotifications && (
                 <div className="notification-dropdown absolute right-0 mt-4 w-72 bg-white rounded-xl shadow-lg border border-slate-200 z-50">
                   <div className="p-4 border-b border-slate-100 font-semibold text-slate-800">
@@ -109,7 +109,7 @@ const LandlordLayout = () => {
           </div>
         </header>
 
-        {/* Dynamic Page Content */}
+        {}
         <div className="landlord-content bg-slate-50 min-h-screen">
           <Outlet />
         </div>

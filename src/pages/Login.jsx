@@ -17,7 +17,7 @@ const Login = () => {
     try {
       await login(email, password);
 
-      // Redirect based on user role
+      
       if (isAdminRole()) {
         navigate('/admin', { replace: true });
       } else if (isLandlordRole()) {

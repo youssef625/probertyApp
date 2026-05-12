@@ -15,12 +15,12 @@ const MyProperties = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState('all');
 
-  // Modal State
+  
   const [showModal, setShowModal] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [currentPropertyId, setCurrentPropertyId] = useState(null);
   
-  // Form State
+  
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -45,7 +45,7 @@ const MyProperties = () => {
     } catch (err) {
       console.error(err);
       setErrorMessages(getApiErrorMessages(err));
-      // Fallback for UI visualization if API fails (since backend might not have this endpoint yet)
+      
       setProperties([]);
     } finally {
       setLoading(false);
@@ -109,7 +109,7 @@ const MyProperties = () => {
     e.preventDefault();
     if (isSubmitting) return;
 
-    // Client-side validation
+    
     const errors = [];
     const title = (formData.title || '').trim();
     const location = (formData.location || '').trim();
@@ -271,7 +271,7 @@ const MyProperties = () => {
         </div>
       </div>
 
-      {/* Add/Edit Modal */}
+      {}
       {showModal && (
         <div className="modal modal-open">
           <div className="modal-box w-11/12 max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -328,7 +328,7 @@ const MyProperties = () => {
                 </div>
               </div>
               
-              {/* Amenities */}
+              {}
               <div className="bg-slate-50 p-4 rounded-lg mb-6 border border-slate-200">
                 <h4 className="font-medium mb-3">Amenities</h4>
                 <div className="flex flex-wrap gap-6">

@@ -9,7 +9,7 @@
   padding: 0;
 }
 
-/* Override #root for admin part if it affects it */
+
 #root:has(.admin-dashboard) {
   width: 100%;
   max-width: 100%;
@@ -233,7 +233,7 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background-color: #ed8936; /* placeholder color */
+  background-color: #ed8936; 
   overflow: hidden;
 }
 
@@ -268,7 +268,7 @@
   text-align: left;
 }
 
-/* Tabs */
+
 .tabs-container {
   display: flex;
   gap: 12px;
@@ -292,14 +292,14 @@
   color: #ffffff;
 }
 
-/* Property Grid */
+
 .property-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 24px;
 }
 
-/* Property Card */
+
 .property-card {
   background-color: #ffffff;
   border-radius: 16px;
@@ -454,7 +454,7 @@
   opacity: 0.9;
 }
 
-/* --- Landlord Requests Page Specific Styles --- */
+
 
 .requests-header-top {
   display: flex;
@@ -500,7 +500,7 @@
   letter-spacing: 0.5px;
 }
 
-/* Table container */
+
 .admin-table-container {
   background-color: #ffffff;
   border-radius: 12px;
@@ -636,7 +636,7 @@
   color: #1a202c;
 }
 
-/* Stats Cards */
+
 .stats-container {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

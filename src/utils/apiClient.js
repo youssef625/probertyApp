@@ -80,7 +80,7 @@ const handleResponse = async (response) => {
       errorMsg = errorData.message || errorData.title || errorData.error || errorMsg;
       errorMessages = normalizeErrorMessages(errorData, errorMsg);
     } catch {
-      // Ignored if parsing fails
+      
     }
     if (errorMessages.length === 0) {
       errorMessages = [errorMsg];

@@ -31,13 +31,13 @@ const VisitRequests = () => {
 
   const handleUpdateStatus = async (id, status) => {
     try {
-      // Optimistic update
+      
       setRequests(prev => prev.map(req => req.id === id ? { ...req, status } : req));
       await landlordService.updateVisitStatus(id, status);
       setActionErrors([]);
     } catch (err) {
       setActionErrors(getApiErrorMessages(err));
-      fetchRequests(); // revert on failure
+      fetchRequests(); 
     }
   };
 

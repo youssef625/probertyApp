@@ -23,7 +23,7 @@ const PropertyCard = ({ property, onAccept, onReject }) => {
         
         <div className="property-landlord">
           <div className="landlord-avatar">
-            {/* Show initials or image */}
+            {}
             {property?.landlord?.name ? property.landlord.name.split(' ').map(n => n[0]).join('') : 'U'}
           </div>
           <div className="landlord-info">

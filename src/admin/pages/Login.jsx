@@ -20,7 +20,7 @@ const Login = () => {
 
     try {
       await login(email, password);
-      // Wait for the cookie to be set, then navigate
+      
       navigate('/admin/property-approvals');
     } catch (err) {
       setErrorMessages(getApiErrorMessages(err));

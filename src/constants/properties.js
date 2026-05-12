@@ -32,5 +32,5 @@ export const properties = [
     status: 'Available Soon',
     thumbnail: 'https://a0.muscache.com/im/pictures/hosting/Hosting-1197153629879952777/original/7abc2df0-8c76-4d3f-8452-7d8b18397c36.jpeg',
   },
-  // Add more entries in the same format as needed.
+  
 ];

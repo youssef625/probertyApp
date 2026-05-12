@@ -1,19 +1,19 @@
 import { useEffect, useState } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 
-// Admin
+
 import AdminLayout from './admin/components/AdminLayout'
 import PropertyApprovals from './admin/pages/PropertyApprovals'
 import LandlordRequests from './admin/pages/LandlordRequests'
 
 
-// Landlord
+
 import LandlordLayout from './landlord/components/LandlordLayout'
 import MyProperties from './landlord/pages/MyProperties'
 import RentalApplications from './landlord/pages/RentalApplications'
 import VisitRequests from './landlord/pages/VisitRequests'
 
-// Public app
+
 import { hasUserSession, AUTH_STATE_EVENT, isAdminRole, isLandlordRole } from './services/api'
 import Login from './pages/Login'
 import Register from './pages/Register'
@@ -22,7 +22,7 @@ import PropertyView from './pages/PropertyView'
 import Favorites from './pages/Favorites'
 import MyApplications from './pages/MyApplications'
 
-// A wrapper for routes that need authentication
+
 const AdminProtectedRoute = ({ children }) => {
   if (!hasUserSession()) return <Navigate to="/login" replace />;
   if (!isAdminRole()) return <Navigate to="/" replace />;
@@ -82,7 +82,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <Routes key={authVersion}>
-          {/* Public app routes */}
+          {}
           <Route path="/login" element={<UserGuestRoute><Login /></UserGuestRoute>} />
           <Route path="/register" element={<UserGuestRoute><Register /></UserGuestRoute>} />
           <Route path="/" element={<PublicUserRoute><Home /></PublicUserRoute>} />
@@ -90,14 +90,14 @@ function App() {
           <Route path="/favorites" element={<UserProtectedRoute><Favorites /></UserProtectedRoute>} />
           <Route path="/my-applications" element={<UserProtectedRoute><MyApplications /></UserProtectedRoute>} />
 
-          {/* Admin */}
+          {}
           <Route path="/admin" element={<AdminProtectedRoute><AdminLayout /></AdminProtectedRoute>}>
             <Route index element={<Navigate to="property-approvals" replace />} />
             <Route path="property-approvals" element={<PropertyApprovals />} />
             <Route path="landlord-requests" element={<LandlordRequests />} />
           </Route>
 
-          {/* Landlord */}
+          {}
           <Route path="/landlord" element={<LandlordProtectedRoute><LandlordLayout /></LandlordProtectedRoute>}>
             <Route index element={<Navigate to="properties" replace />} />
             <Route path="properties" element={<MyProperties />} />

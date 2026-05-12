@@ -19,7 +19,7 @@ const Home = () => {
   const [error, setError] = useState(null);
   const isLoggedIn = hasUserSession();
 
-  // Search/filter state
+  
   const [searchLocation, setSearchLocation] = useState('');
   const [priceRange, setPriceRange] = useState('');
   const [propertyType, setPropertyType] = useState('');
@@ -81,7 +81,7 @@ const Home = () => {
     <div className="min-h-screen bg-base-200">
       <TenantNavbar />
       <div className="max-w-7xl mx-auto px-6 py-12">
-        {/* Header */}
+        {}
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-4xl md:text-5xl font-bold flex items-center gap-3">
             <span className="inline-flex items-center justify-center rounded-full bg-primary/10 text-primary p-2">
@@ -104,7 +104,7 @@ const Home = () => {
           </div>
         </div>
 
-        {/* Search & Filter */}
+        {}
         <form onSubmit={handleSearch} className="card bg-base-100 shadow-lg p-6 mb-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
@@ -175,7 +175,7 @@ const Home = () => {
 
         {error && <div className="alert alert-warning mb-6">{error}</div>}
 
-        {/* Property Grid */}
+        {}
         {properties.length === 0 && !error ? (
           <div className="text-center py-20 text-xl text-base-content/60">
             No properties match your search

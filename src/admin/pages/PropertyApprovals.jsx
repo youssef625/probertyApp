@@ -21,7 +21,7 @@ const PropertyApprovals = () => {
       const data = await adminService.getPendingProperties();
       const rawArray = Array.isArray(data) ? data : (data?.data || data?.items || []);
       
-      // Map the backend schema to what the PropertyCard component expects
+      
       return rawArray.map(item => ({
         id: item.id,
         title: item.title,
@@ -33,17 +33,17 @@ const PropertyApprovals = () => {
         status: item.approvalStatus === 'Pending' ? 'NEW SUBMISSION' : (item.approvalStatus || 'NEW SUBMISSION'),
         landlord: {
           name: item.landlordName || 'Unknown Landlord',
-          verified: true // adjust if backend provides a verified flag later
+          verified: true 
         }
       }));
     },
-    staleTime: 5 * 60 * 1000, // keep cache fresh for 5 minutes
+    staleTime: 5 * 60 * 1000, 
   });
 
   const handleAccept = async (id) => {
     try {
       await adminService.approveProperty(id);
-      // Remove from Cache instantly
+      
       queryClient.setQueryData(['pendingProperties'], (old) => old?.filter(p => (p.id || p.propertyId) !== id));
       setActionErrors([]);
     } catch (err) {
@@ -54,7 +54,7 @@ const PropertyApprovals = () => {
   const handleReject = async (id) => {
     try {
       await adminService.rejectProperty(id);
-      // Remove from Cache instantly
+      
       queryClient.setQueryData(['pendingProperties'], (old) => old?.filter(p => (p.id || p.propertyId) !== id));
       setActionErrors([]);
     } catch (err) {

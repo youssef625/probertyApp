@@ -1,6 +1,6 @@
 import { apiClient, getApiBaseUrl, USER_TOKEN_KEY } from '../utils/apiClient';
 
-// Base URL for the RentVibe API
+
 const API_ORIGIN = getApiBaseUrl();
 export const AUTH_STATE_EVENT = 'auth-state-changed';
 export { USER_TOKEN_KEY };
@@ -8,7 +8,7 @@ export { USER_TOKEN_KEY };
 export const resolveMediaUrl = (url) => {
   if (!url || typeof url !== 'string') return '';
 
-  if (/^(https?:)?\/\//i.test(url) || /^data:|^blob:/i.test(url)) {
+  if (/^(https?:)?\/\//.test(url)) {
     return url;
   }
 
@@ -42,7 +42,7 @@ const decodeJwtPayload = (token) => {
   try {
     const payload = JSON.parse(decoded);
     
-    // Normalize .NET claims to simpler properties if they exist
+    
     const claimRole = payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
     if (claimRole && !payload.role) {
       payload.role = claimRole;
@@ -73,11 +73,11 @@ const normalizeRole = (role) => (typeof role === 'string' ? role.toLowerCase() :
 
 const extractRoleFromPayload = (payload) => {
 
-  console.log('Decoded JWT Payload:', payload); // Debugging line
+  console.log('Decoded JWT Payload:', payload); 
   if (!payload || typeof payload !== 'object') return '';
 
   const roleValue = payload.role || payload.roles || payload.permissions;
-  console.log('Extracted Role Value:', roleValue); // Debugging line
+  console.log('Extracted Role Value:', roleValue); 
   if (Array.isArray(roleValue)) {
     const roles = roleValue.map(normalizeRole).filter(Boolean);
     if (roles.includes('admin')) return 'admin';
@@ -97,9 +97,9 @@ const notifyAuthChanged = () => {
   window.dispatchEvent(new Event(AUTH_STATE_EVENT));
 };
 
-// =====================================================
-// Authentication
-// =====================================================
+
+
+
 
 export const login = async (email, password) => {
   try {
@@ -140,9 +140,9 @@ export const register = async (userData) => {
   }
 };
 
-// =====================================================
-// Notifications
-// =====================================================
+
+
+
 
 export const getMyNotifications = async (limit = 5) => {
   try {
@@ -154,9 +154,9 @@ export const getMyNotifications = async (limit = 5) => {
   }
 };
 
-// =====================================================
-// Properties
-// =====================================================
+
+
+
 
 export const getProperties = async (filters = {}) => {
   try {
@@ -187,9 +187,9 @@ export const createProperty = async (propertyData) => {
   }
 };
 
-// =====================================================
-// Favorites
-// =====================================================
+
+
+
 
 export const getFavorites = async () => {
   try {
@@ -218,9 +218,9 @@ export const removeFromFavorites = async (propertyId) => {
   }
 };
 
-// =====================================================
-// Applications
-// =====================================================
+
+
+
 
 export const getMyApplications = async () => {
   try {
@@ -264,7 +264,7 @@ export const uploadApplicationDocuments = async (applicationId, files = []) => {
       const data = await response.json();
       message = data?.message || data?.title || data?.error || message;
     } catch {
-      // ignore parsing errors
+      
     }
     throw new Error(message);
   }
@@ -276,9 +276,9 @@ export const uploadApplicationDocuments = async (applicationId, files = []) => {
   }
 };
 
-// =====================================================
-// Visits
-// =====================================================
+
+
+
 
 export const scheduleVisit = async (propertyId, requestedDate, message = '') => {
   try {
@@ -302,9 +302,9 @@ export const getMyVisits = async () => {
   }
 };
 
-// =====================================================
-// Reviews
-// =====================================================
+
+
+
 
 export const getPropertyReviews = async (propertyId) => {
   try {

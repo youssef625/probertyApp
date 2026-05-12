@@ -1,9 +1,9 @@
 import { gql } from '@apollo/client';
 import { apolloClient } from './graphqlClient';
 
-// =====================================================
-// Queries
-// =====================================================
+
+
+
 
 const GET_PROPERTIES = gql`
   query GetProperties($search: String, $location: String, $minPrice: Decimal, $maxPrice: Decimal, $propertyType: String) {
@@ -59,9 +59,9 @@ const GET_PROPERTY_BY_ID = gql`
   }
 `;
 
-// =====================================================
-// Mutations
-// =====================================================
+
+
+
 
 const CREATE_PROPERTY = gql`
   mutation CreateProperty($dto: CreatePropertyDtoInput!) {
@@ -117,14 +117,11 @@ const DELETE_PROPERTY = gql`
   }
 `;
 
-// =====================================================
-// Query Functions
-// =====================================================
 
-/**
- * Fetch all available properties with optional filters via GraphQL.
- * Used by the tenant-facing Home page for browsing.
- */
+
+
+
+
 export const getPropertiesGql = async (filters = {}) => {
   const variables = {};
   if (filters.search) variables.search = filters.search;
@@ -142,10 +139,7 @@ export const getPropertiesGql = async (filters = {}) => {
   return data?.properties ?? [];
 };
 
-/**
- * Fetch a single property by ID via GraphQL.
- * Used by the PropertyView detail page.
- */
+
 export const getPropertyByIdGql = async (id) => {
   const { data } = await apolloClient.query({
     query: GET_PROPERTY_BY_ID,
@@ -156,14 +150,11 @@ export const getPropertyByIdGql = async (id) => {
   return data?.propertyById ?? null;
 };
 
-// =====================================================
-// Mutation Functions
-// =====================================================
 
-/**
- * Create a new property via GraphQL mutation.
- * Used by the landlord "Add Property" form.
- */
+
+
+
+
 export const createPropertyGql = async (propertyData) => {
   const dto = {
     title: propertyData.title,
@@ -187,10 +178,7 @@ export const createPropertyGql = async (propertyData) => {
   return data?.createProperty ?? null;
 };
 
-/**
- * Update an existing property via GraphQL mutation.
- * Used by the landlord "Edit Property" form.
- */
+
 export const updatePropertyGql = async (id, propertyData) => {
   const dto = {
     title: propertyData.title,
@@ -214,10 +202,7 @@ export const updatePropertyGql = async (id, propertyData) => {
   return data?.updateProperty ?? null;
 };
 
-/**
- * Delete a property via GraphQL mutation.
- * Used by the landlord property management page.
- */
+
 export const deletePropertyGql = async (id) => {
   const { data } = await apolloClient.mutate({
     mutation: DELETE_PROPERTY,

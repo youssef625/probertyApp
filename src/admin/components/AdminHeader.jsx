@@ -97,7 +97,7 @@ const AdminHeader = () => {
             <div className="admin-role">System Manager</div>
           </div>
           <div className="admin-avatar">
-            {/* Using a placeholder avatar image from unavatar or div */}
+            {}
             <img src="https://i.pravatar.cc/150?u=a042581f4e29026704d" alt="Admin Default avatar" />
           </div>
         </div>

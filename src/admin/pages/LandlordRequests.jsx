@@ -16,7 +16,7 @@ const LandlordRequests = () => {
       const data = await adminService.getPendingLandlords();
       return Array.isArray(data) ? data : (data?.data || data?.items || []);
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 5 * 60 * 1000, 
   });
 
   const handleApprove = async (id) => {
@@ -77,7 +77,7 @@ const LandlordRequests = () => {
              <div style={{ padding: '24px', textAlign: 'center', color: '#718096' }}>Loading requests...</div>
           )}
           {requests.map((request, index) => {
-            // Mapping Fallbacks in case APIs differ slightly from UI mock
+            
             const id = request.id || request.landlordId || index;
             const name = request.name || 'Unknown Landlord';
             const email = request.email || 'No email provided';

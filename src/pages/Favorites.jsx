@@ -52,7 +52,7 @@ const Favorites = () => {
     e.stopPropagation();
     try {
       await removeFromFavorites(propertyId);
-      // Remove from local state to avoid refetching everything
+      
       setFavorites(prev => prev.filter(f => f.propertyId !== propertyId && f.id !== propertyId));
       setActionErrors([]);
     } catch (err) {
@@ -76,7 +76,7 @@ const Favorites = () => {
     <div className="min-h-screen bg-base-200">
       <TenantNavbar />
       <div className="max-w-7xl mx-auto px-6 py-12">
-        {/* Header */}
+        {}
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-4xl md:text-5xl font-bold text-primary flex items-center gap-3">
             <span className="inline-flex items-center justify-center rounded-full bg-primary/10 text-primary p-2">
@@ -93,7 +93,7 @@ const Favorites = () => {
         <ErrorBanner messages={pageErrors} className="mb-4" />
         <ErrorBanner messages={actionErrors} className="mb-6" />
 
-        {/* Favorite Grid */}
+        {}
         {visibleFavorites.length === 0 && pageErrors.length === 0 ? (
           <div className="text-center py-20">
             <h2 className="text-2xl font-semibold mb-4 text-base-content/70">No properties in favorites</h2>
@@ -102,7 +102,7 @@ const Favorites = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {visibleFavorites.map((fav) => {
-              // Handle potential mismatches between favorites DTO and property model
+              
               const propertyId = fav.propertyId || fav.id;
               const prop = fav.property || fav; 
               
@@ -112,7 +112,7 @@ const Favorites = () => {
                 to={`/property/${propertyId}`}
                 className="card bg-base-100 shadow-xl hover:shadow-2xl transition-all relative group"
               >
-                {/* Remove button (appears on hover) */}
+                {}
                 <button 
                   onClick={(e) => handleRemove(e, propertyId)}
                   className="btn btn-circle btn-sm btn-error absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity"

@@ -1,4 +1,4 @@
-// src/pages/PropertyView.jsx
+
 
 import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
@@ -47,7 +47,7 @@ const PropertyView = () => {
   const [reviewComment, setReviewComment] = useState('');
   const [reviewSubmitting, setReviewSubmitting] = useState(false);
 
-  // Rental application state
+  
   const [hasPendingApplication, setHasPendingApplication] = useState(false);
   const [hasAcceptedApplication, setHasAcceptedApplication] = useState(false);
   const [appStartDate, setAppStartDate] = useState('');
@@ -56,7 +56,7 @@ const PropertyView = () => {
   const [appFiles, setAppFiles] = useState([]);
   const [appSubmitting, setAppSubmitting] = useState(false);
 
-  // Fetch property details when component mounts or ID changes
+  
   useEffect(() => {
     const fetchPropertyDetails = async () => {
       try {
@@ -170,7 +170,7 @@ const PropertyView = () => {
     fetchReviews();
   }, [id]);
 
-  // Handle favorite toggle action
+  
   const handleFavoriteToggle = async () => {
     if (!hasUserSession()) {
       setActionMessage({ type: 'warning', text: 'Please sign in to add to favorites' });
@@ -195,7 +195,7 @@ const PropertyView = () => {
     setTimeout(() => setActionMessage(null), 3000);
   };
 
-  // Handle visit scheduling
+  
   const handleScheduleVisit = async () => {
     if (!hasUserSession()) {
       setActionMessage({ type: 'warning', text: 'Please sign in to schedule a visit' });
@@ -263,7 +263,7 @@ const PropertyView = () => {
     }
   };
 
-  // Handle rental application submission
+  
   const handleSubmitApplication = async () => {
     if (!hasUserSession()) {
       setActionMessage({ type: 'warning', text: 'Please sign in to apply for rental' });
@@ -292,7 +292,7 @@ const PropertyView = () => {
         appMessage.trim()
       );
 
-      // Upload documents if any were selected
+      
       if (appFiles.length > 0 && result?.id) {
         await uploadApplicationDocuments(result.id, Array.from(appFiles));
       }
@@ -312,7 +312,7 @@ const PropertyView = () => {
     setTimeout(() => setActionMessage(null), 4000);
   };
 
-  // Loading state
+  
   if (loading) {
     return (
       <>
@@ -325,7 +325,7 @@ const PropertyView = () => {
     );
   }
 
-  // Error or property not found state
+  
   if (error || !property) {
     return (
       <>
@@ -352,13 +352,13 @@ const PropertyView = () => {
     );
   }
 
-  // Render property details
+  
   const imageList = property.images?.length > 0 ? property.images : (property.imageUrls || []);
 
   return (
     <div className="min-h-screen bg-base-200 text-base-content">
       <TenantNavbar />
-      {/* Action feedback toast */}
+      {}
       {actionMessage && (
         <div
           className={`alert shadow-lg fixed top-4 left-1/2 transform -translate-x-1/2 z-50 max-w-md ${actionMessage.type === 'success' ? 'alert-success' :
@@ -378,7 +378,7 @@ const PropertyView = () => {
         </div>
       )}
 
-      {/* Image Carousel */}
+      {}
       <div className="carousel w-full h-[400px] md:h-[550px] bg-base-300">
         {imageList.length > 0 ? (
           imageList.map((img, index) => (
@@ -415,7 +415,7 @@ const PropertyView = () => {
         )}
       </div>
 
-      {/* Main content section */}
+      {}
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-12">
         <div className="mb-6">
           <button className="btn btn-outline gap-2" onClick={() => navigate('/')}
@@ -582,7 +582,7 @@ const PropertyView = () => {
             </div>
           </div>
 
-          {/* Sidebar */}
+          {}
           <div className="lg:col-span-1">
             <div className="card bg-base-100 shadow-2xl sticky top-6">
               <div className="card-body">
@@ -655,7 +655,7 @@ const PropertyView = () => {
                       </button>
                     </div>
 
-                    {/* Rental Application Section */}
+                    {}
                     <div className="divider">Apply for Rental</div>
                     {hasPendingApplication ? (
                       <div className="alert alert-info">
